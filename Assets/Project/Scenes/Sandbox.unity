@@ -692,7 +692,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 256909469}
   m_LocalRotation: {x: 0.37622422, y: 0, z: 0, w: 0.92652863}
-  m_LocalPosition: {x: -6, y: 30, z: -18.6}
+  m_LocalPosition: {x: -6, y: 41.8, z: -38}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1124,17 +1124,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c7f1cb578765f14aa0cc2beb247ec59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speedMod: 15
   Cam: {fileID: 256909473}
   midiFilePlayer: {fileID: 114662786151458000}
   midiStreamPlayer: {fileID: 114320349357267343}
   NoteDisplay: {fileID: 78497567608405585}
   ControlDisplay: {fileID: 1426841787}
-  Plane: {fileID: 1725540698}
+  Plane: {fileID: 719193185}
   leftMostNote: {fileID: 640819945}
   rightMostNote: {fileID: 2031923635}
+  validationLine: {fileID: 1318148510}
   numKeys: 88
   lowestMidiValue: 21
   highestMidiValue: 108
+  mode: 3
   minZ: 0
   maxZ: 0
   minX: 0
@@ -1144,6 +1147,12 @@ MonoBehaviour:
   FirstDelayCollider: 20
   MatNewNote: {fileID: 2100000, guid: 675943411bac0004c8e9cfcb2fb5825d, type: 2}
   MatNewController: {fileID: 2100000, guid: e55ce311c9837454cbba3a77729068b5, type: 2}
+--- !u!1 &719193185 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5746357701485925476, guid: 98ea15acd4af41342a8cb5f6a5b31077,
+    type: 3}
+  m_PrefabInstance: {fileID: 1527632704}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &828442407
 GameObject:
   m_ObjectHideFlags: 0
@@ -1635,6 +1644,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1104041441}
   m_CullTransparentMesh: 0
+--- !u!1 &1318148510 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5027219911098939930, guid: 98ea15acd4af41342a8cb5f6a5b31077,
+    type: 3}
+  m_PrefabInstance: {fileID: 1527632704}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1426841787 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8905798158130911171, guid: 9675f2fcf377b4d45ad58d881d4198ea,
@@ -1745,17 +1760,17 @@ PrefabInstance:
     - target: {fileID: 1408532510268983380, guid: 98ea15acd4af41342a8cb5f6a5b31077,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 50
+      value: 73.1
       objectReference: {fileID: 0}
     - target: {fileID: 1408532510268983380, guid: 98ea15acd4af41342a8cb5f6a5b31077,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 50
+      value: 73.1
       objectReference: {fileID: 0}
     - target: {fileID: 1408532510268983380, guid: 98ea15acd4af41342a8cb5f6a5b31077,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 50
+      value: 73.1
       objectReference: {fileID: 0}
     - target: {fileID: 1408532510268983380, guid: 98ea15acd4af41342a8cb5f6a5b31077,
         type: 3}
@@ -1765,12 +1780,12 @@ PrefabInstance:
     - target: {fileID: 1408532510268983380, guid: 98ea15acd4af41342a8cb5f6a5b31077,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -47.29
+      value: 5.93
       objectReference: {fileID: 0}
     - target: {fileID: 1408532510268983380, guid: 98ea15acd4af41342a8cb5f6a5b31077,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -7.58
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1408532510268983380, guid: 98ea15acd4af41342a8cb5f6a5b31077,
         type: 3}
@@ -2173,6 +2188,75 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1527632704}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2046661136
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3257378929780560226, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_Name
+      value: Gameplay Mic
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560239, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560239, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560239, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560239, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560239, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560239, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560239, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560239, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560239, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560239, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560239, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f00c8d8d8cb22d14eb73836631ba50a0, type: 3}
 --- !u!1 &1096695267612073
 GameObject:
   m_ObjectHideFlags: 0
@@ -3190,8 +3274,8 @@ MonoBehaviour:
   spatialize: 0
   AudioBufferLenght: 0
   AudioNumBuffers: 0
-  midiNameToPlay: All Chromatic
-  midiIndexToPlay: 0
+  midiNameToPlay: Happy Birthday
+  midiIndexToPlay: 4
   MPTK_StartPlayAtFirstNote: 0
   speed: 1
   durationEditorModeOnly: 

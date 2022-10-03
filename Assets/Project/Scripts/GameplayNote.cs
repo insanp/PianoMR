@@ -18,9 +18,17 @@ namespace PianoTesisGameplay
         public MPTKEvent note;
         public MidiStreamPlayer midiStreamPlayer;
         public bool played = false;
+        public bool correctNote = false;
         public Material MatPlayed;
         public float zOriginal;
         public float xOriginal;
+
+        private void Start()
+        {
+            played = false;
+            correctNote = false;
+        }
+
         // 
         /// <summary>@brief
         /// Update
@@ -32,7 +40,7 @@ namespace PianoTesisGameplay
         public void Update()
         {
             // The midi event is played with a MidiStreamPlayer when position X < -45 (falling)
-            if (!played && transform.position.y < 10f)
+            if (!played && correctNote) //transform.position.y < 10f)
             {
                 played = true;
                 // If original z is not the same, the value will be changed, too bad for the ears ...
@@ -58,6 +66,11 @@ namespace PianoTesisGameplay
             // Move the note along the X axis
             float translation = Time.fixedDeltaTime * GameplayMusic.Speed;
             transform.Translate(0, -translation, 0);
+        }
+
+        public void CorrectNote()
+        {
+            correctNote = true;
         }
     }
 }

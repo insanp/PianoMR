@@ -8,8 +8,8 @@ namespace PianoTesisGameplay
 {
     public class GameplayMusic : MonoBehaviour
     {
-
-        public static float Speed = 15f;
+        public float speedMod = 15f;
+        public static float Speed;
         public Camera Cam;
         public MidiFilePlayer midiFilePlayer;
         public MidiStreamPlayer midiStreamPlayer;
@@ -20,11 +20,20 @@ namespace PianoTesisGameplay
 
         [SerializeField] public Transform leftMostNote;
         [SerializeField] public Transform rightMostNote;
+        [SerializeField] public GameObject validationLine;
+
         private float semitoneDistance;
         public int numKeys = 88;
 
         public int lowestMidiValue = 21;
         public int highestMidiValue = 108;
+
+        public enum GameMode
+        {
+            NONE, PLAY, TRAIN, WATCH
+        }
+
+        public GameMode mode;
 
         private float startPosY = 30f;
         private float startPosZ = 0f;
@@ -54,6 +63,7 @@ namespace PianoTesisGameplay
 
             // Default size of a Unity Plan
             float planSize = 10f;
+            Speed = speedMod;
 
             CalculateSemitoneDistance();
 
@@ -125,6 +135,7 @@ namespace PianoTesisGameplay
                             noteview.midiStreamPlayer = midiStreamPlayer;
                             noteview.note = mptkEvent; // the midi event is attached to the gameobjet, will be played more later
                             noteview.gameObject.GetComponent<Renderer>().material = MatNewNote;
+                            noteview.transform.parent = Plane.transform;
                             // See noteview.cs: update() move the note along the plan until they fall out, then they are played
                             noteview.zOriginal = position.z;
 
@@ -256,8 +267,41 @@ namespace PianoTesisGameplay
         {
             if (midiFilePlayer != null && midiFilePlayer.MPTK_IsPlaying)
             {
-                // do nothing
+                // check game mode
+                ExecuteGameMode();
             }
+        }
+
+        private void ExecuteGameMode()
+        {
+            switch (mode)
+            {
+                case GameMode.PLAY:
+                    break;
+                case GameMode.TRAIN:
+                    CheckNoteCollision();
+                    break;
+                case GameMode.WATCH:
+                default:
+                    break;
+            }
+        }
+
+        private void CheckNoteCollision()
+        {
+            
+        }
+
+        public void PauseSpeed()
+        {
+            midiFilePlayer.MPTK_Pause();
+            Speed = 0f;
+        }
+
+        public void ResumeSpeed()
+        {
+            midiFilePlayer.MPTK_Play();
+            Speed = speedMod;
         }
     }
 }
