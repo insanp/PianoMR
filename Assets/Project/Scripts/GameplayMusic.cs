@@ -8,7 +8,7 @@ namespace PianoTesisGameplay
 {
     public class GameplayMusic : MonoBehaviour
     {
-        public float speedMod = 15f;
+        public float speedMod = 0.2f;
         public static float Speed;
         public Camera Cam;
         public MidiFilePlayer midiFilePlayer;
@@ -20,13 +20,16 @@ namespace PianoTesisGameplay
 
         [SerializeField] public Transform leftMostNote;
         [SerializeField] public Transform rightMostNote;
-        [SerializeField] public GameObject validationLine;
+        [SerializeField] public GameplayValidationLine validationLine;
+        [SerializeField] public GameplayMic gMic;
+        [SerializeField] public Transform thePianoParent;
 
         private float semitoneDistance;
+        private Vector3 semitoneDistanceVector;
         public int numKeys = 88;
 
-        public int lowestMidiValue = 21;
-        public int highestMidiValue = 108;
+        public int lowestMidiValue = HelperPianoFreq.lowestMidi;
+        public int highestMidiValue = HelperPianoFreq.highestMidi;
 
         public enum GameMode
         {
@@ -35,7 +38,7 @@ namespace PianoTesisGameplay
 
         public GameMode mode;
 
-        private float startPosY = 30f;
+        private float startPosY = 0.5f;
         private float startPosZ = 0f;
 
         public float minZ, maxZ, minX, maxX;
@@ -67,6 +70,9 @@ namespace PianoTesisGameplay
 
             CalculateSemitoneDistance();
 
+            startPosY = this.transform.localPosition.y + startPosY;
+            startPosZ = this.transform.localPosition.z + startPosZ;
+
             minZ = Plane.transform.localPosition.z - Plane.transform.localScale.z * planSize / 2f;
             maxZ = Plane.transform.localPosition.z + Plane.transform.localScale.z * planSize / 2f;
 
@@ -88,11 +94,13 @@ namespace PianoTesisGameplay
 
         }
 
-        private void CalculateSemitoneDistance()
+        public void CalculateSemitoneDistance()
         {
             // must be divided by numKeys - 1 so that distance correctly placed from end to end
             semitoneDistance = Math.Abs(rightMostNote.position.x - leftMostNote.position.x) / (numKeys - 1);
+            semitoneDistanceVector = (rightMostNote.position - leftMostNote.position) / (numKeys - 1);
             Debug.Log(semitoneDistance);
+            Debug.Log(semitoneDistanceVector);
         }
 
         /// <summary>@brief
@@ -126,16 +134,25 @@ namespace PianoTesisGameplay
                             posY = startPosY;
                             posZ = startPosZ;
                             //Vector3 position = new Vector3(maxX, 2 + countZ[Convert.ToInt32(z - minZ)] * 4f, z);
-                            Vector3 position = new Vector3(posX, posY, posZ);
+                            Vector3 position = new Vector3();
+                            position = leftMostNote.transform.position;
+                            position.x += (mptkEvent.Value - lowestMidiValue) * semitoneDistanceVector.x;
+                            position.y += startPosY;
+                            position.z += (mptkEvent.Value - lowestMidiValue) * semitoneDistanceVector.z;
 
                             // Instanciate a gamobject to represent this midi event in the 3D world
-                            GameplayNote noteview = Instantiate<GameplayNote>(NoteDisplay, position, Quaternion.identity);
+                            GameplayNote noteview = Instantiate<GameplayNote>(NoteDisplay, Plane.transform, false);
                             noteview.gameObject.SetActive(true);
                             noteview.hideFlags = HideFlags.HideInHierarchy;
                             noteview.midiStreamPlayer = midiStreamPlayer;
                             noteview.note = mptkEvent; // the midi event is attached to the gameobjet, will be played more later
                             noteview.gameObject.GetComponent<Renderer>().material = MatNewNote;
-                            noteview.transform.parent = Plane.transform;
+
+                            //noteview.transform.parent = Plane.transform;
+                            noteview.transform.position = position;
+                            noteview.transform.rotation = Quaternion.identity;
+                            noteview.transform.localScale = NoteDisplay.transform.localScale;
+
                             // See noteview.cs: update() move the note along the plan until they fall out, then they are played
                             noteview.zOriginal = position.z;
 
@@ -185,6 +202,8 @@ namespace PianoTesisGameplay
 
         void OnGUI()
         {
+            //return;
+
             int startx = 5;
             int starty = 90;
             int maxwidth = Screen.width;
@@ -269,6 +288,7 @@ namespace PianoTesisGameplay
             {
                 // check game mode
                 ExecuteGameMode();
+                gMic.ClearPitchValues();
             }
         }
 
@@ -279,7 +299,7 @@ namespace PianoTesisGameplay
                 case GameMode.PLAY:
                     break;
                 case GameMode.TRAIN:
-                    CheckNoteCollision();
+                    ValidateNote();
                     break;
                 case GameMode.WATCH:
                 default:
@@ -287,9 +307,24 @@ namespace PianoTesisGameplay
             }
         }
 
-        private void CheckNoteCollision()
+        private void ValidateNote()
         {
-            
+            if (gMic.pitchValues.Count == 0) return;
+
+            foreach (NotePeak notePeak in gMic.pitchValues)
+            {
+                foreach (GameplayNote gameNote in validationLine.notes)
+                {
+                    Debug.Log(HelperPianoFreq.getLabelFromMIDI(gameNote.note.Value));
+                    // if any of the peaks the same, then the note is played
+                    if (notePeak.key == HelperPianoFreq.getLabelFromMIDI(gameNote.note.Value))
+                    {
+                        // correct node and remove from validation list
+                        gameNote.correctNote = true;
+                        validationLine.notes.Remove(gameNote);
+                    }
+                }
+            }
         }
 
         public void PauseSpeed()

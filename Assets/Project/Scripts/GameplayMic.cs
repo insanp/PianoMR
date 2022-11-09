@@ -44,9 +44,7 @@ namespace PianoTesisGameplay
             {
                 if (Microphone.devices.Length > 0)
                 {
-                    defaultMic = Microphone.devices[0].ToString();
-                    _audioSource.outputAudioMixerGroup = mixerGroupMic;
-                    _audioSource.clip = Microphone.Start(defaultMic, true, 10, sampleRate);
+                    StartCoroutine(CaptureMic());
                 }
                 else
                 {
@@ -59,6 +57,17 @@ namespace PianoTesisGameplay
             }
 
             freqStep = sampleRate / _samples.Length;
+        }
+
+        IEnumerator CaptureMic()
+        {
+            defaultMic = Microphone.devices[0].ToString();
+            _audioSource.outputAudioMixerGroup = mixerGroupMic;
+            _audioSource.clip = Microphone.Start(defaultMic, true, 1, sampleRate);
+            _audioSource.loop = true;
+            while (!(Microphone.GetPosition(null) > 0)) { }
+            _audioSource.Play();
+            yield return null;
         }
 
         // Update is called once per frame
@@ -75,8 +84,8 @@ namespace PianoTesisGameplay
             GetSpectrumAudioSource();
             MakeFrequencyBands();
             //CheckMaxFrequencyFromSample();
-            AnalyzePitch();
-            //AnalyzeMultiPitch();
+            //AnalyzePitch();
+            AnalyzeMultiPitch();
             //ClearPitchValues();
         }
 
@@ -159,14 +168,14 @@ namespace PianoTesisGameplay
                 prevVal = curVal;
             }
 
-            Debug.Log("====");
+            //Debug.Log("====");
             foreach (NotePeak kvp in pitchValues)
             {
                 Debug.Log("Key = " + kvp.key + " Freq = " + kvp.freq + " Value = " + kvp.val);
             }
         }
 
-        private void ClearPitchValues()
+        public void ClearPitchValues()
         {
             pitchValues.Clear();
         }
@@ -193,7 +202,7 @@ namespace PianoTesisGameplay
 
             if (maxFreq >= 0.5f)
             {
-                Debug.Log(HelperPianoFreq.labels[Array.IndexOf(_freqBand, maxFreq)]);
+                //Debug.Log(HelperPianoFreq.labels[Array.IndexOf(_freqBand, maxFreq)]);
             }
         }
 
@@ -203,7 +212,7 @@ namespace PianoTesisGameplay
 
             if (maxFreq >= 0.1f)
             {
-                Debug.Log(Array.IndexOf(_samples, maxFreq));
+                //Debug.Log(Array.IndexOf(_samples, maxFreq));
             }
         }
 

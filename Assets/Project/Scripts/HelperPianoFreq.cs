@@ -4,6 +4,9 @@ using UnityEngine;
 
 public static class HelperPianoFreq
 {
+    public static int lowestMidi = 21;
+    public static int highestMidi = 108;
+
     public static readonly float[] keys =
     {
         27.50000f, // A0
@@ -235,5 +238,14 @@ public static class HelperPianoFreq
         }
 
         return indexBot;
+    }
+
+    public static string getLabelFromMIDI(int index)
+    {
+        if (index >= lowestMidi && index <= highestMidi)
+        {
+            return labels[index - lowestMidi];
+        }
+        return "";
     }
 }

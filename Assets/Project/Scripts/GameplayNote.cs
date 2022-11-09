@@ -55,7 +55,7 @@ namespace PianoTesisGameplay
 
                 gameObject.GetComponent<Renderer>().material = MatPlayed;// .color = Color.red;
             }
-            if (transform.position.y < -30f)
+            if (transform.position.y < -2f || correctNote)
             {
                 Destroy(this.gameObject);
             }
