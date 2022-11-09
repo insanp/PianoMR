@@ -20,8 +20,7 @@ namespace PianoTesisGameplay
         public bool played = false;
         public bool correctNote = false;
         public Material MatPlayed;
-        public float zOriginal;
-        public float xOriginal;
+        public Vector3 targetVector;
 
         private void Start()
         {
@@ -43,11 +42,7 @@ namespace PianoTesisGameplay
             if (!played && correctNote) //transform.position.y < 10f)
             {
                 played = true;
-                // If original z is not the same, the value will be changed, too bad for the ears ...
-                int delta = (int)(zOriginal - transform.position.z);
-                //Debug.Log($"Note:{note.Value} Z:{transform.position.z:F1} DeltaZ:{delta} Travel Time:{note.MPTK_DeltaTimeMillis} ms");
-                //! [Example PlayNote]
-                note.Value += delta; // change the original note
+
                 // Now play the note with a MidiStreamPlayer prefab
                 midiStreamPlayer.MPTK_PlayEvent(note);
                 //! [Example PlayNote]
@@ -63,9 +58,11 @@ namespace PianoTesisGameplay
         }
         void FixedUpdate()
         {
-            // Move the note along the X axis
-            float translation = Time.fixedDeltaTime * GameplayMusic.Speed;
-            transform.Translate(0, -translation, 0);
+            // Move the note along all axis up to target line
+            //float translation = Time.fixedDeltaTime * GameplayMusic.Speed;
+            //transform.Translate(0, -translation, 0);
+            Vector3 translation = targetVector * Time.fixedDeltaTime * GameplayMusic.Speed;
+            transform.Translate(translation);
         }
 
         public void CorrectNote()

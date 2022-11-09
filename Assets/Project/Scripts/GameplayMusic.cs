@@ -21,11 +21,13 @@ namespace PianoTesisGameplay
         [SerializeField] public Transform leftMostNote;
         [SerializeField] public Transform rightMostNote;
         [SerializeField] public GameplayValidationLine validationLine;
+        [SerializeField] public Transform targetLine;
+        [SerializeField] public Transform spawnLine;
         [SerializeField] public GameplayMic gMic;
         [SerializeField] public Transform thePianoParent;
 
-        private float semitoneDistance;
-        private Vector3 semitoneDistanceVector;
+        public Vector3 semitoneDistanceVector;
+        public Vector3 spawnLineDistanceVector;
         public int numKeys = 88;
 
         public int lowestMidiValue = HelperPianoFreq.lowestMidi;
@@ -37,9 +39,6 @@ namespace PianoTesisGameplay
         }
 
         public GameMode mode;
-
-        private float startPosY = 0.5f;
-        private float startPosZ = 0f;
 
         public float minZ, maxZ, minX, maxX;
         public float LastTimeCollider;
@@ -70,9 +69,6 @@ namespace PianoTesisGameplay
 
             CalculateSemitoneDistance();
 
-            startPosY = this.transform.localPosition.y + startPosY;
-            startPosZ = this.transform.localPosition.z + startPosZ;
-
             minZ = Plane.transform.localPosition.z - Plane.transform.localScale.z * planSize / 2f;
             maxZ = Plane.transform.localPosition.z + Plane.transform.localScale.z * planSize / 2f;
 
@@ -97,10 +93,9 @@ namespace PianoTesisGameplay
         public void CalculateSemitoneDistance()
         {
             // must be divided by numKeys - 1 so that distance correctly placed from end to end
-            semitoneDistance = Math.Abs(rightMostNote.position.x - leftMostNote.position.x) / (numKeys - 1);
             semitoneDistanceVector = (rightMostNote.position - leftMostNote.position) / (numKeys - 1);
-            Debug.Log(semitoneDistance);
-            Debug.Log(semitoneDistanceVector);
+            spawnLineDistanceVector = spawnLine.position - targetLine.position;
+            Debug.Log(spawnLineDistanceVector);
         }
 
         /// <summary>@brief
@@ -122,39 +117,28 @@ namespace PianoTesisGameplay
                         //Debug.Log($"NoteOn Channel:{note.Channel}  Preset index:{midiStreamPlayer.MPTK_ChannelPresetGetIndex(note.Channel)}  Preset name:{midiStreamPlayer.MPTK_ChannelPresetGetName(note.Channel)}");
                         if (mptkEvent.Value >= lowestMidiValue && mptkEvent.Value <= highestMidiValue)// && note.Channel==1)
                         {
-                            // Z position is set depending the note value:mptkEvent.Value
-                            //Debug.Log(mptkEvent.Value + " is " + HelperNoteLabel.LabelFromMidi(mptkEvent.Value));
-                            float z = Mathf.Lerp(minZ, maxZ, (mptkEvent.Value - 40) / 60f);
-                            countZ[Convert.ToInt32(z - minZ)]++;
+                            // x and z position is placed depending on the note and rotation
+                            // y rotation is prohibited and start from spawn line
+                            // spawn from the spawn line position
 
-                            // x position is placed depending on the note
-                            // lowest midi value is 21, highest midi value is 108
-                            float posX, posY, posZ;
-                            posX = leftMostNote.position.x + (mptkEvent.Value - lowestMidiValue) * semitoneDistance;
-                            posY = startPosY;
-                            posZ = startPosZ;
-                            //Vector3 position = new Vector3(maxX, 2 + countZ[Convert.ToInt32(z - minZ)] * 4f, z);
                             Vector3 position = new Vector3();
-                            position = leftMostNote.transform.position;
+                            position = leftMostNote.transform.position + spawnLineDistanceVector;
                             position.x += (mptkEvent.Value - lowestMidiValue) * semitoneDistanceVector.x;
-                            position.y += startPosY;
                             position.z += (mptkEvent.Value - lowestMidiValue) * semitoneDistanceVector.z;
 
-                            // Instanciate a gamobject to represent this midi event in the 3D world
+                            // Instantiate a gamobject to represent this midi event in the 3D world
                             GameplayNote noteview = Instantiate<GameplayNote>(NoteDisplay, Plane.transform, false);
                             noteview.gameObject.SetActive(true);
                             noteview.hideFlags = HideFlags.HideInHierarchy;
                             noteview.midiStreamPlayer = midiStreamPlayer;
-                            noteview.note = mptkEvent; // the midi event is attached to the gameobjet, will be played more later
+                            noteview.note = mptkEvent; // the midi event is attached to the gameobject, will be played more later
                             noteview.gameObject.GetComponent<Renderer>().material = MatNewNote;
 
-                            //noteview.transform.parent = Plane.transform;
                             noteview.transform.position = position;
                             noteview.transform.rotation = Quaternion.identity;
                             noteview.transform.localScale = NoteDisplay.transform.localScale;
 
-                            // See noteview.cs: update() move the note along the plan until they fall out, then they are played
-                            noteview.zOriginal = position.z;
+                            noteview.targetVector = targetLine.position - spawnLine.position;
 
                             if (!GameplayNote.FirstNotePlayed)
                                 PlaySound();

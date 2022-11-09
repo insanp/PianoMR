@@ -692,7 +692,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 256909469}
   m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 0.01, z: -0.01}
+  m_LocalPosition: {x: 0, y: 0.4, z: -0.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1272,6 +1272,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 911150543}
   m_CullTransparentMesh: 0
+--- !u!4 &911974339 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8163201673912901826, guid: 98ea15acd4af41342a8cb5f6a5b31077,
+    type: 3}
+  m_PrefabInstance: {fileID: 1527632704}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &919086158
 GameObject:
   m_ObjectHideFlags: 0
@@ -1296,7 +1302,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919086158}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.32, y: -0.56, z: 0.83}
+  m_LocalPosition: {x: 0.32, y: -0.2, z: 0.83}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -1509,6 +1515,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1067671935}
   m_CullTransparentMesh: 0
+--- !u!4 &1100696496 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3542126593199708566, guid: 98ea15acd4af41342a8cb5f6a5b31077,
+    type: 3}
+  m_PrefabInstance: {fileID: 1527632704}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1104041441
 GameObject:
   m_ObjectHideFlags: 0
@@ -1717,6 +1729,14 @@ PrefabInstance:
     - target: {fileID: 1065675191, guid: 98ea15acd4af41342a8cb5f6a5b31077, type: 3}
       propertyPath: m_LocalScale.z
       value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1065675196, guid: 98ea15acd4af41342a8cb5f6a5b31077, type: 3}
+      propertyPath: m_Mass
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1065675196, guid: 98ea15acd4af41342a8cb5f6a5b31077, type: 3}
+      propertyPath: m_UseGravity
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1408532510268983380, guid: 98ea15acd4af41342a8cb5f6a5b31077,
         type: 3}
@@ -3648,6 +3668,16 @@ PrefabInstance:
       propertyPath: speedMod
       value: 0.2
       objectReference: {fileID: 0}
+    - target: {fileID: 5026760824967835379, guid: c73c2f2df2d6c4b49b94e8ca0113aa60,
+        type: 3}
+      propertyPath: spawnLine
+      value: 
+      objectReference: {fileID: 1100696496}
+    - target: {fileID: 5026760824967835379, guid: c73c2f2df2d6c4b49b94e8ca0113aa60,
+        type: 3}
+      propertyPath: targetLine
+      value: 
+      objectReference: {fileID: 911974339}
     - target: {fileID: 5026760824967835379, guid: c73c2f2df2d6c4b49b94e8ca0113aa60,
         type: 3}
       propertyPath: NoteDisplay
