@@ -19,13 +19,27 @@ namespace PianoTesisGameplay
         public MidiStreamPlayer midiStreamPlayer;
         public bool played = false;
         public bool correctNote = false;
-        public Material MatPlayed;
+        public bool isSharp = false;
+
+        [SerializeField] public Material matBlackKey;
+        [SerializeField] public Material matWhiteKey;
+        [SerializeField] public Material matPlayed;
+
         public Vector3 targetVector;
 
         private void Start()
         {
             played = false;
             correctNote = false;
+            if (MidiPlayerTK.HelperNoteLabel.IsSharp(note.Value))
+            {
+                isSharp = true;
+                gameObject.GetComponent<Renderer>().material = matBlackKey;
+            } else
+            {
+                isSharp = false;
+                gameObject.GetComponent<Renderer>().material = matWhiteKey;
+            }
         }
 
         // 
@@ -48,7 +62,7 @@ namespace PianoTesisGameplay
                 //! [Example PlayNote]
                 FirstNotePlayed = true;
 
-                gameObject.GetComponent<Renderer>().material = MatPlayed;// .color = Color.red;
+                gameObject.GetComponent<Renderer>().material = matPlayed;// .color = Color.red;
             }
             if (transform.position.y < -2f || correctNote)
             {

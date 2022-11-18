@@ -29,6 +29,7 @@ namespace PianoTesisGameplay
         private float[] _freqBandHighest = new float[8];
 
         public List<NotePeak> pitchValues = new List<NotePeak>();
+        public String[] micValues;
 
         // Start is called before the first frame update
         void Start()
@@ -40,34 +41,27 @@ namespace PianoTesisGameplay
             _samples = new float[fftSize];
             _freqBand = new float[pianoFreqSize];
 
-            if (useMic)
-            {
-                if (Microphone.devices.Length > 0)
-                {
-                    StartCoroutine(CaptureMic());
-                }
-                else
-                {
-                    useMic = false;
-                }
-            }
-            else
-            {
-                _audioSource.outputAudioMixerGroup = mixerGroupMaster;
-            }
-
             freqStep = sampleRate / _samples.Length;
         }
 
         IEnumerator CaptureMic()
         {
-            defaultMic = Microphone.devices[0].ToString();
+            micValues = Microphone.devices;
+            defaultMic = micValues[0].ToString();
             _audioSource.outputAudioMixerGroup = mixerGroupMic;
             _audioSource.clip = Microphone.Start(defaultMic, true, 1, sampleRate);
             _audioSource.loop = true;
-            while (!(Microphone.GetPosition(null) > 0)) { }
+            while (!(Microphone.GetPosition(null) > 0)) {}
             _audioSource.Play();
             yield return null;
+        }
+
+        public void CleanMic()
+        {
+            defaultMic = micValues[0].ToString();
+            _audioSource.clip = null;
+            _audioSource.loop = false;
+            Microphone.End(defaultMic);
         }
 
         // Update is called once per frame
@@ -82,11 +76,11 @@ namespace PianoTesisGameplay
             }
 
             GetSpectrumAudioSource();
-            MakeFrequencyBands();
+            //MakeFrequencyBands();
             //CheckMaxFrequencyFromSample();
             //AnalyzePitch();
             AnalyzeMultiPitch();
-            //ClearPitchValues();
+            ClearPitchValues();
         }
 
         private void AnalyzePitch()
@@ -168,7 +162,7 @@ namespace PianoTesisGameplay
                 prevVal = curVal;
             }
 
-            //Debug.Log("====");
+            Debug.Log("====");
             foreach (NotePeak kvp in pitchValues)
             {
                 Debug.Log("Key = " + kvp.key + " Freq = " + kvp.freq + " Value = " + kvp.val);
@@ -263,6 +257,32 @@ namespace PianoTesisGameplay
 
                 _freqBand[i] = val * 10;
             }
+        }
+
+        public void StartMic()
+        {
+
+            if (useMic)
+            {
+                if (Microphone.devices.Length > 0)
+                {
+                    StartCoroutine(CaptureMic());
+                }
+                else
+                {
+                    useMic = false;
+                }
+            }
+            else
+            {
+                _audioSource.outputAudioMixerGroup = mixerGroupMaster;
+            }
+        }
+
+        public void StopMic()
+        {
+            StopCoroutine(CaptureMic());
+            CleanMic();
         }
     }
 }

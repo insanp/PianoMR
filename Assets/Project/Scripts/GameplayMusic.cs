@@ -147,6 +147,7 @@ namespace PianoTesisGameplay
 
                     case MPTKCommand.PatchChange:
                         {
+                            /*
                             //Debug.Log($"PatchChange Channel:{note.Channel}  Preset index:{note.Value}");
                             // Z position is set depending the note value:mptkEvent.Value
                             float z = Mathf.Lerp(minZ, maxZ, mptkEvent.Value / 127f);
@@ -161,6 +162,7 @@ namespace PianoTesisGameplay
                             patchview.note = mptkEvent; // the midi event is attached to the gameobjet, will be played more later
                             patchview.gameObject.GetComponent<Renderer>().material = MatNewController;
                             patchview.zOriginal = position.z;
+                            */
                         }
                         break;
                 }

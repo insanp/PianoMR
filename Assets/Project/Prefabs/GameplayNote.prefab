@@ -75,7 +75,9 @@ MonoBehaviour:
   midiStreamPlayer: {fileID: 0}
   played: 0
   correctNote: 0
-  MatPlayed: {fileID: 2100000, guid: ceb63b2dd532dd441a67e70830492731, type: 2}
+  matBlackKey: {fileID: 2100000, guid: 83af10fb360fab14fa4ab464b6a0f20e, type: 2}
+  matWhiteKey: {fileID: 2100000, guid: 5d913821ee08ae540bd6da4f692999d8, type: 2}
+  matPlayed: {fileID: 2100000, guid: 61d6b36eb6cb5884686960efae97f915, type: 2}
   targetVector: {x: 0, y: 0, z: 0}
 --- !u!23 &78497568221217960
 MeshRenderer:
