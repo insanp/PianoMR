@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -15,6 +16,7 @@ namespace PianoTesisGameplay
         public AudioMixerGroup mixerGroupMic, mixerGroupMaster;
 
         [SerializeField] public string defaultMic;
+        [SerializeField] public TextMeshPro debugText;
 
         // FFT Values
         public int sampleRate; // for finer frequency with lower samples
@@ -22,6 +24,8 @@ namespace PianoTesisGameplay
         public int pianoFreqSize;
         public float[] _samples;
         public float[] _freqBand;
+        public float noiseLevel = 0.01f;
+        public float time;
 
         private float freqStep;
         private float[] _bandBuffer = new float[512];
@@ -43,27 +47,7 @@ namespace PianoTesisGameplay
 
             freqStep = sampleRate / _samples.Length;
         }
-
-        IEnumerator CaptureMic()
-        {
-            micValues = Microphone.devices;
-            defaultMic = micValues[0].ToString();
-            _audioSource.outputAudioMixerGroup = mixerGroupMic;
-            _audioSource.clip = Microphone.Start(defaultMic, true, 1, sampleRate);
-            _audioSource.loop = true;
-            while (!(Microphone.GetPosition(null) > 0)) {}
-            _audioSource.Play();
-            yield return null;
-        }
-
-        public void CleanMic()
-        {
-            defaultMic = micValues[0].ToString();
-            _audioSource.clip = null;
-            _audioSource.loop = false;
-            Microphone.End(defaultMic);
-        }
-
+        
         // Update is called once per frame
         void Update()
         {
@@ -83,29 +67,59 @@ namespace PianoTesisGameplay
             ClearPitchValues();
         }
 
-        private void AnalyzePitch()
+        public void StartMic()
         {
-            float maxV = 0;
-            var maxN = 0;
-            for (int i = 0; i < fftSize; i++)
-            {
-                // find max and filter noise
-                if (!(_samples[i] > maxV) || !(_samples[i] > 0.01f))
-                    continue;
 
-                maxV = _samples[i];
-                maxN = i; // maxN is the index of max
+            if (useMic)
+            {
+                if (Microphone.devices.Length > 0)
+                {
+                    StartCoroutine(CaptureMic());
+                }
+                else
+                {
+                    useMic = false;
+                }
             }
-            float freqN = maxN; // pass the index to a float variable
-            if (maxN > 0 && maxN < fftSize - 1)
-            { // interpolate index using neighbours
-                var dL = _samples[maxN - 1] / _samples[maxN]; //This line 1
-                var dR = _samples[maxN + 1] / _samples[maxN]; //This line 2
-                freqN += 0.5f * (dR * dR - dL * dL); //This line 3
+            else
+            {
+                _audioSource.outputAudioMixerGroup = mixerGroupMaster;
             }
-            float pitchValue = freqN * (sampleRate / 2) / fftSize; // convert index to frequency //This line 4
-            Debug.Log(maxN + " = " + pitchValue);
-            Debug.Log(HelperPianoFreq.labels[HelperPianoFreq.searchNear(pitchValue)]);
+        }
+
+        public void StopMic()
+        {
+            StopCoroutine(CaptureMic());
+            CleanMic();
+        }
+
+        IEnumerator CaptureMic()
+        {
+            micValues = Microphone.devices;
+            defaultMic = micValues[0].ToString();
+            _audioSource.outputAudioMixerGroup = mixerGroupMic;
+            _audioSource.clip = Microphone.Start(defaultMic, true, 1, sampleRate);
+            _audioSource.loop = true;
+            while (!(Microphone.GetPosition(null) > 0)) {}
+            _audioSource.Play();
+            if (debugText != null)
+            {
+                debugText.text = string.Join(" ", micValues);
+            }
+            yield return null;
+        }
+
+        public void CleanMic()
+        {
+            defaultMic = micValues[0].ToString();
+            _audioSource.clip = null;
+            _audioSource.loop = false;
+            Microphone.End(defaultMic);
+        }
+
+        private void GetSpectrumAudioSource()
+        {
+            _audioSource.GetSpectrumData(_samples, 0, FFTWindow.BlackmanHarris);
         }
 
         private void AnalyzeMultiPitch()
@@ -162,7 +176,7 @@ namespace PianoTesisGameplay
                 prevVal = curVal;
             }
 
-            Debug.Log("====");
+            //Debug.Log("====");
             foreach (NotePeak kvp in pitchValues)
             {
                 Debug.Log("Key = " + kvp.key + " Freq = " + kvp.freq + " Value = " + kvp.val);
@@ -190,6 +204,58 @@ namespace PianoTesisGameplay
             return pitchValue;
         }
 
+        public void DetermineNoiseLevel()
+        {
+            StartCoroutine(CapturingNoise());
+        }
+
+
+        IEnumerator CapturingNoise()
+        {
+            Debug.Log("Determining noise");
+            float captureTime = 3.0f;
+            float timer = 0.0f;
+            int numSample = 1;
+            float vol = _samples.Max();
+
+            while (timer <= captureTime)
+            {
+                vol += _samples.Max();
+                timer += Time.deltaTime;
+                numSample++;
+                yield return null;
+            }
+
+            vol /= numSample;
+            noiseLevel = vol;
+            Debug.Log("Noise has max at " + noiseLevel);
+        }
+
+        private void AnalyzePitch()
+        {
+            float maxV = 0;
+            var maxN = 0;
+            for (int i = 0; i < fftSize; i++)
+            {
+                // find max and filter noise
+                if (!(_samples[i] > maxV) || !(_samples[i] > 0.01f))
+                    continue;
+
+                maxV = _samples[i];
+                maxN = i; // maxN is the index of max
+            }
+            float freqN = maxN; // pass the index to a float variable
+            if (maxN > 0 && maxN < fftSize - 1)
+            { // interpolate index using neighbours
+                var dL = _samples[maxN - 1] / _samples[maxN]; //This line 1
+                var dR = _samples[maxN + 1] / _samples[maxN]; //This line 2
+                freqN += 0.5f * (dR * dR - dL * dL); //This line 3
+            }
+            float pitchValue = freqN * (sampleRate / 2) / fftSize; // convert index to frequency //This line 4
+            Debug.Log(maxN + " = " + pitchValue);
+            Debug.Log(HelperPianoFreq.labels[HelperPianoFreq.searchNear(pitchValue)]);
+        }
+
         private void CheckMaxFrequencyFromBand()
         {
             float maxFreq = _freqBand.Max();
@@ -208,11 +274,6 @@ namespace PianoTesisGameplay
             {
                 //Debug.Log(Array.IndexOf(_samples, maxFreq));
             }
-        }
-
-        private void GetSpectrumAudioSource()
-        {
-            _audioSource.GetSpectrumData(_samples, 0, FFTWindow.BlackmanHarris);
         }
         private void MakeFrequencyBands()
         {
@@ -257,32 +318,6 @@ namespace PianoTesisGameplay
 
                 _freqBand[i] = val * 10;
             }
-        }
-
-        public void StartMic()
-        {
-
-            if (useMic)
-            {
-                if (Microphone.devices.Length > 0)
-                {
-                    StartCoroutine(CaptureMic());
-                }
-                else
-                {
-                    useMic = false;
-                }
-            }
-            else
-            {
-                _audioSource.outputAudioMixerGroup = mixerGroupMaster;
-            }
-        }
-
-        public void StopMic()
-        {
-            StopCoroutine(CaptureMic());
-            CleanMic();
         }
     }
 }

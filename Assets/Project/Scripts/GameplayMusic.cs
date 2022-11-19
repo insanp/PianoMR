@@ -88,6 +88,8 @@ namespace PianoTesisGameplay
             else
                 Debug.Log("MusicView: no MidiFilePlayer detected");
 
+            // stop music at first
+            PauseSpeed();
         }
 
         public void CalculateSemitoneDistance()
@@ -186,6 +188,11 @@ namespace PianoTesisGameplay
             //! [Example PlayNote]
         }
 
+        public void NextSong()
+        {
+
+        }
+
         void OnGUI()
         {
             //return;
@@ -205,11 +212,13 @@ namespace PianoTesisGameplay
                 {
                     Clear();
                     midiFilePlayer.MPTK_Previous();
+                    PauseSpeed();
                 }
                 if (GUILayout.Button(new GUIContent("Next", ""), GUILayout.Width(150)))
                 {
                     Clear();
                     midiFilePlayer.MPTK_Next();
+                    PauseSpeed();
                 }
                 if (GUILayout.Button(new GUIContent("Clear", ""), GUILayout.Width(150)))
                     Clear();
