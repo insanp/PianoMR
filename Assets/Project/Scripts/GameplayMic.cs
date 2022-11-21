@@ -16,7 +16,6 @@ namespace PianoTesisGameplay
         public AudioMixerGroup mixerGroupMic, mixerGroupMaster;
 
         [SerializeField] public string defaultMic;
-        [SerializeField] public TextMeshPro debugText;
 
         // FFT Values
         public int sampleRate; // for finer frequency with lower samples
@@ -102,10 +101,6 @@ namespace PianoTesisGameplay
             _audioSource.loop = true;
             while (!(Microphone.GetPosition(null) > 0)) {}
             _audioSource.Play();
-            if (debugText != null)
-            {
-                debugText.text = string.Join(" ", micValues);
-            }
             yield return null;
         }
 

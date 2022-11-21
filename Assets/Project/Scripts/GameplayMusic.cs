@@ -190,7 +190,16 @@ namespace PianoTesisGameplay
 
         public void NextSong()
         {
+            Clear();
+            midiFilePlayer.MPTK_Next();
+            PauseSpeed();
+        }
 
+        public void PrevSong()
+        {
+            Clear();
+            midiFilePlayer.MPTK_Previous();
+            PauseSpeed();
         }
 
         void OnGUI()
@@ -210,15 +219,11 @@ namespace PianoTesisGameplay
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button(new GUIContent("Previous", ""), GUILayout.Width(150)))
                 {
-                    Clear();
-                    midiFilePlayer.MPTK_Previous();
-                    PauseSpeed();
+                    PrevSong();
                 }
                 if (GUILayout.Button(new GUIContent("Next", ""), GUILayout.Width(150)))
                 {
-                    Clear();
-                    midiFilePlayer.MPTK_Next();
-                    PauseSpeed();
+                    NextSong();
                 }
                 if (GUILayout.Button(new GUIContent("Clear", ""), GUILayout.Width(150)))
                     Clear();
@@ -333,5 +338,6 @@ namespace PianoTesisGameplay
             midiFilePlayer.MPTK_Play();
             Speed = speedMod;
         }
+
     }
 }
