@@ -339,5 +339,31 @@ namespace PianoTesisGameplay
             Speed = speedMod;
         }
 
+        public void StartSong(int val)
+        {
+            switch (val) {
+                case 0:
+                    mode = GameMode.NONE;
+                    break;
+                case 1:
+                    mode = GameMode.PLAY;
+                    break;
+                case 2:
+                    mode = GameMode.TRAIN;
+                    break;
+                case 3:
+                default:
+                    mode = GameMode.WATCH;
+                    ResumeSpeed();
+                    break;
+            }
+        }
+
+        public void StopSong()
+        {
+            PauseSpeed();
+            Clear();
+            midiFilePlayer.MPTK_Stop();
+        }
     }
 }

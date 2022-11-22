@@ -12,6 +12,9 @@ namespace PianoTesisGameplay
         [SerializeField] GameObject ThePiano;
 
         [SerializeField] public TextMeshPro titleSong;
+        [SerializeField] public TextMeshPro titleSongInMode;
+        [SerializeField] public TextMeshPro titleSongInGameplay;
+
         private GameplayMusic gMusic;
 
         // Start is called before the first frame update
@@ -19,22 +22,19 @@ namespace PianoTesisGameplay
         {
             gMusic = FindObjectOfType<GameplayMusic>();
             ToggleMovePiano();
+            UpdateTitleSong();
         }
 
         // Update is called once per frame
         void Update()
         {
-            titleSong.text = gMusic.midiFilePlayer.MPTK_MidiName;
+            
         }
 
-        public void ShowGameplayMode()
+        public void UpdateTitleSong()
         {
-
-        }
-
-        public void HideGameplayMode()
-        {
-
+            titleSong.text = titleSongInMode.text =
+                titleSongInGameplay.text = gMusic.midiFilePlayer.MPTK_MidiName;
         }
 
         public void ToggleMovePiano()
@@ -46,6 +46,11 @@ namespace PianoTesisGameplay
             {
                 ThePiano.GetComponent<ObjectManipulator>().enabled = false;
             }
+        }
+
+        public void StopSong()
+        {
+            gMusic.StopSong();
         }
     }
 }
