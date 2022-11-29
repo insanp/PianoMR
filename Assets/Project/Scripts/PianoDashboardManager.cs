@@ -9,11 +9,15 @@ namespace PianoTesisGameplay
     public class PianoDashboardManager : MonoBehaviour
     {
         [SerializeField] GameObject CallibrationToggle;
+        [SerializeField] GameObject ShowKeysToggle;
         [SerializeField] GameObject ThePiano;
 
         [SerializeField] public TextMeshPro titleSong;
         [SerializeField] public TextMeshPro titleSongInMode;
         [SerializeField] public TextMeshPro titleSongInGameplay;
+
+        [SerializeField] public GameObject blackKeys;
+        [SerializeField] public GameObject whiteKeys;
 
         private GameplayMusic gMusic;
 
@@ -22,6 +26,7 @@ namespace PianoTesisGameplay
         {
             gMusic = FindObjectOfType<GameplayMusic>();
             ToggleMovePiano();
+            ToggleShowKeys();
             UpdateTitleSong();
         }
 
@@ -45,6 +50,20 @@ namespace PianoTesisGameplay
             } else
             {
                 ThePiano.GetComponent<ObjectManipulator>().enabled = false;
+            }
+        }
+
+        public void ToggleShowKeys()
+        {
+            if (ShowKeysToggle.GetComponent<Interactable>().IsToggled)
+            {
+                blackKeys.SetActive(true);
+                whiteKeys.SetActive(true);
+            }
+            else
+            {
+                blackKeys.SetActive(false);
+                whiteKeys.SetActive(false);
             }
         }
 
