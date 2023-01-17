@@ -20,6 +20,7 @@ namespace PianoTesisGameplay
         public bool played = false;
         public bool correctNote = false;
         public bool isSharp = false;
+        public bool canSound = true;
 
         [SerializeField] public Material matBlackKey;
         [SerializeField] public Material matWhiteKey;
@@ -58,7 +59,7 @@ namespace PianoTesisGameplay
                 played = true;
 
                 // Now play the note with a MidiStreamPlayer prefab
-                midiStreamPlayer.MPTK_PlayEvent(note);
+                if (canSound) midiStreamPlayer.MPTK_PlayEvent(note);
                 //! [Example PlayNote]
                 FirstNotePlayed = true;
 

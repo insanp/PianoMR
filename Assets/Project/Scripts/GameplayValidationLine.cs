@@ -40,8 +40,11 @@ namespace PianoTesisGameplay {
                 if (gMusic.mode == GameplayMusic.GameMode.WATCH)
                 {
                     tmp.CorrectNote();
+                    gMusic.totalHitNotes++;
+                } else
+                {
+                    notes.Add(collision.gameObject.GetComponent<GameplayNote>());
                 }
-                notes.Add(collision.gameObject.GetComponent<GameplayNote>());
             }
         }
 
@@ -50,7 +53,14 @@ namespace PianoTesisGameplay {
             if (collision.gameObject.tag == "Note")
             {
                 notes.Remove(collision.gameObject.GetComponent<GameplayNote>());
+                gMusic.totalMissNotes++;
+                Destroy(collision.gameObject);
             }
+        }
+
+        public void ClearNotes()
+        {
+            notes.Clear();
         }
     }
 }

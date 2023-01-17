@@ -33,6 +33,10 @@ namespace PianoTesisGameplay
         public int lowestMidiValue = HelperPianoFreq.lowestMidi;
         public int highestMidiValue = HelperPianoFreq.highestMidi;
 
+        public int totalNotes;
+        public int totalHitNotes;
+        public int totalMissNotes;
+
         public enum GameMode
         {
             NONE, PLAY, TRAIN, WATCH
@@ -136,14 +140,15 @@ namespace PianoTesisGameplay
                             noteview.note = mptkEvent; // the midi event is attached to the gameobject, will be played more later
                             noteview.gameObject.GetComponent<Renderer>().material = MatNewNote;
 
+                            if (mode != GameMode.WATCH) noteview.canSound = false;
+
                             noteview.transform.position = position;
                             noteview.transform.rotation = Quaternion.identity;
                             noteview.transform.localScale = NoteDisplay.transform.localScale;
 
                             noteview.targetVector = targetLine.position - spawnLine.position;
 
-                            if (!GameplayNote.FirstNotePlayed)
-                                PlaySound();
+                            totalNotes++;
                         }
                         break;
 
@@ -280,6 +285,9 @@ namespace PianoTesisGameplay
                     //Debug.Log("destroy " + ut.name);
                     DestroyImmediate(noteview.gameObject);
             }
+
+            // destroy all notes in validation line
+            validationLine.ClearNotes();
         }
 
         void Update()
@@ -297,6 +305,7 @@ namespace PianoTesisGameplay
             switch (mode)
             {
                 case GameMode.PLAY:
+                    ValidateNote();
                     break;
                 case GameMode.TRAIN:
                     ValidateNote();
@@ -322,6 +331,7 @@ namespace PianoTesisGameplay
                         // correct node and remove from validation list
                         gameNote.correctNote = true;
                         validationLine.notes.Remove(gameNote);
+                        totalHitNotes++;
                     }
                 }
             }
@@ -354,9 +364,10 @@ namespace PianoTesisGameplay
                 case 3:
                 default:
                     mode = GameMode.WATCH;
-                    ResumeSpeed();
                     break;
             }
+            totalNotes = totalHitNotes = totalMissNotes = 0;
+            ResumeSpeed();
         }
 
         public void StopSong()

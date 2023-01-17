@@ -16,6 +16,9 @@ namespace PianoTesisGameplay
         [SerializeField] public TextMeshPro titleSongInMode;
         [SerializeField] public TextMeshPro titleSongInGameplay;
 
+        [SerializeField] public TextMeshPro totalHit;
+        [SerializeField] public TextMeshPro totalMiss;
+
         [SerializeField] public GameObject blackKeys;
         [SerializeField] public GameObject whiteKeys;
 
@@ -33,13 +36,22 @@ namespace PianoTesisGameplay
         // Update is called once per frame
         void Update()
         {
-            
+            UpdateTotalNotesPlay();
         }
 
         public void UpdateTitleSong()
         {
             titleSong.text = titleSongInMode.text =
                 titleSongInGameplay.text = gMusic.midiFilePlayer.MPTK_MidiName;
+        }
+
+        public void UpdateTotalNotesPlay()
+        {
+            if (gMusic.midiFilePlayer.MPTK_IsPlaying)
+            {
+                totalHit.text = gMusic.totalHitNotes.ToString();
+                totalMiss.text = gMusic.totalMissNotes.ToString();
+            }
         }
 
         public void ToggleMovePiano()
