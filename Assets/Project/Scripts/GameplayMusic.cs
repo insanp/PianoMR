@@ -4,6 +4,8 @@ using UnityEngine;
 using MidiPlayerTK;
 using System;
 using UnityEngine.Events;
+using System.IO;
+
 namespace PianoTesisGameplay
 {
     public class GameplayMusic : MonoBehaviour
@@ -36,6 +38,10 @@ namespace PianoTesisGameplay
         public int totalNotes;
         public int totalHitNotes;
         public int totalMissNotes;
+
+        public bool isPlaying;
+
+        public Dictionary<string, NotePlayStatistics> notePlayStats;
 
         public enum GameMode
         {
@@ -70,6 +76,7 @@ namespace PianoTesisGameplay
             // Default size of a Unity Plan
             float planSize = 10f;
             Speed = speedMod;
+            isPlaying = false;
 
             CalculateSemitoneDistance();
 
@@ -94,6 +101,7 @@ namespace PianoTesisGameplay
 
             // stop music at first
             PauseSpeed();
+            InitializeNotePlayStats();
         }
 
         public void CalculateSemitoneDistance()
@@ -148,7 +156,7 @@ namespace PianoTesisGameplay
 
                             noteview.targetVector = targetLine.position - spawnLine.position;
 
-                            totalNotes++;
+                            AddTotalNote(HelperPianoFreq.getLabelFromMIDI(mptkEvent.Value));
                         }
                         break;
 
@@ -292,12 +300,41 @@ namespace PianoTesisGameplay
 
         void Update()
         {
-            if (midiFilePlayer != null && midiFilePlayer.MPTK_IsPlaying)
+            if (midiFilePlayer != null && isPlaying)
             {
                 // check game mode
                 ExecuteGameMode();
                 gMic.ClearPitchValues();
+
+                if (totalNotes > 0 && totalNotes == (totalHitNotes + totalMissNotes))
+                {
+                    isPlaying = false;
+                    ShowResults();
+                }
             }
+        }
+
+        private void ShowResults()
+        {
+            SaveLog();
+
+            foreach (KeyValuePair<String, NotePlayStatistics> note in notePlayStats)
+            {
+                Debug.Log(note.Key.ToString() + ": " + note.Value.totalHit + " / " + note.Value.total);
+            }
+            //throw new NotImplementedException();
+        }
+
+        private void SaveLog()
+        {
+            string path = Application.persistentDataPath + "/" + midiFilePlayer.MPTK_MidiName +
+                "_" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".txt";
+
+            StreamWriter writer = new(path, true);
+            writer.WriteLine("Test");
+            writer.Close();
+
+            Debug.Log(path);
         }
 
         private void ExecuteGameMode()
@@ -331,7 +368,7 @@ namespace PianoTesisGameplay
                         // correct node and remove from validation list
                         gameNote.correctNote = true;
                         validationLine.notes.Remove(gameNote);
-                        totalHitNotes++;
+                        AddNoteHit(notePeak.key);
                     }
                 }
             }
@@ -366,8 +403,10 @@ namespace PianoTesisGameplay
                     mode = GameMode.WATCH;
                     break;
             }
-            totalNotes = totalHitNotes = totalMissNotes = 0;
+            
+            ResetNotePlayStats();
             ResumeSpeed();
+            isPlaying = true;
         }
 
         public void StopSong()
@@ -375,6 +414,43 @@ namespace PianoTesisGameplay
             PauseSpeed();
             Clear();
             midiFilePlayer.MPTK_Stop();
+            isPlaying = false;
+        }
+
+        public void InitializeNotePlayStats()
+        {
+            notePlayStats = new Dictionary<string, NotePlayStatistics>();
+            foreach (string label in HelperPianoFreq.labels)
+            {
+                notePlayStats.Add(label, new NotePlayStatistics(label));
+            }
+        }
+
+        public void ResetNotePlayStats()
+        {
+            totalNotes = totalHitNotes = totalMissNotes = 0;
+            foreach (KeyValuePair<string, NotePlayStatistics> entry in notePlayStats)
+            {
+                entry.Value.Reset();
+            }
+        }
+
+        public void AddNoteHit(string label)
+        {
+            notePlayStats[label].AddHit();
+            totalHitNotes++;
+        }
+
+        public void AddNoteMiss(string label)
+        {
+            notePlayStats[label].AddMiss();
+            totalMissNotes++;
+        }
+
+        public void AddTotalNote(string label)
+        {
+            notePlayStats[label].AddTotal();
+            totalNotes++;
         }
     }
 }

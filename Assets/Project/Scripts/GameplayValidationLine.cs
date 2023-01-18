@@ -35,15 +35,15 @@ namespace PianoTesisGameplay {
         {
             if (collision.gameObject.tag == "Note")
             {
-                GameplayNote tmp = collision.GetComponent<GameplayNote>();
-                tmp.GetComponent<Renderer>().material.color = Color.blue;
+                GameplayNote note = collision.GetComponent<GameplayNote>();
+                note.GetComponent<Renderer>().material.color = Color.red;
                 if (gMusic.mode == GameplayMusic.GameMode.WATCH)
                 {
-                    tmp.CorrectNote();
-                    gMusic.totalHitNotes++;
+                    note.CorrectNote();
+                    gMusic.AddNoteHit(HelperPianoFreq.getLabelFromMIDI(note.note.Value));
                 } else
                 {
-                    notes.Add(collision.gameObject.GetComponent<GameplayNote>());
+                    notes.Add(note);
                 }
             }
         }
@@ -52,8 +52,9 @@ namespace PianoTesisGameplay {
         {
             if (collision.gameObject.tag == "Note")
             {
-                notes.Remove(collision.gameObject.GetComponent<GameplayNote>());
-                gMusic.totalMissNotes++;
+                GameplayNote note = collision.GetComponent<GameplayNote>();
+                gMusic.AddNoteMiss(HelperPianoFreq.getLabelFromMIDI(note.note.Value));
+                notes.Remove(note);
                 Destroy(collision.gameObject);
             }
         }

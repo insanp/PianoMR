@@ -47,11 +47,8 @@ namespace PianoTesisGameplay
 
         public void UpdateTotalNotesPlay()
         {
-            if (gMusic.midiFilePlayer.MPTK_IsPlaying)
-            {
-                totalHit.text = gMusic.totalHitNotes.ToString();
-                totalMiss.text = gMusic.totalMissNotes.ToString();
-            }
+            totalHit.text = gMusic.totalHitNotes.ToString();
+            totalMiss.text = gMusic.totalMissNotes.ToString();
         }
 
         public void ToggleMovePiano()

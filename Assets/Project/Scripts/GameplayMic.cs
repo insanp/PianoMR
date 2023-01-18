@@ -68,12 +68,12 @@ namespace PianoTesisGameplay
 
         public void StartMic()
         {
-
             if (useMic)
             {
                 if (Microphone.devices.Length > 0)
                 {
                     StartCoroutine(CaptureMic());
+                    //MicInitialize()
                 }
                 else
                 {
