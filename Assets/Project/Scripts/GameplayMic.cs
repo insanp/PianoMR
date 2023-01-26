@@ -13,6 +13,7 @@ namespace PianoTesisGameplay
     public class GameplayMic : MonoBehaviour
     {
         public bool useMic;
+        public bool useMRTK;
         private AudioSource _audioSource;
         public AudioMixerGroup mixerGroupMic, mixerGroupMaster;
         private WindowsMicrophoneStream micStream = null;
@@ -35,26 +36,6 @@ namespace PianoTesisGameplay
 
         public List<NotePeak> pitchValues = new List<NotePeak>();
         public String[] micValues;
-
-        private void InitializeMicMRTK()
-        {
-            micStream = new WindowsMicrophoneStream();
-
-            if (micStream == null)
-            {
-                Debug.Log("Failed to create the Windows Microphone Stream object");
-            }
-
-            micStream.Gain = 1.0f;
-
-            // Initialize the microphone stream.
-            WindowsMicrophoneStreamErrorCode result = micStream.Initialize(WindowsMicrophoneStreamType.RoomCapture);
-            if (result != WindowsMicrophoneStreamErrorCode.Success)
-            {
-                Debug.Log($"Failed to initialize the microphone stream. {result}");
-                return;
-            }
-        }
 
         // Start is called before the first frame update
         void Start()
@@ -85,15 +66,35 @@ namespace PianoTesisGameplay
             //CheckMaxFrequencyFromSample();
             //AnalyzePitch();
             AnalyzeMultiPitch();
-            ClearPitchValues();
+        }
+
+        private void InitializeMicMRTK()
+        {
+            micStream = new WindowsMicrophoneStream();
+            micStream.Uninitialize();
+
+            if (micStream == null)
+            {
+                Debug.Log("Failed to create the Windows Microphone Stream object");
+            }
+
+            micStream.Gain = 1.0f;
+
+            // Initialize the microphone stream.
+            WindowsMicrophoneStreamErrorCode result = micStream.Initialize(WindowsMicrophoneStreamType.RoomCapture);
+            if (result != WindowsMicrophoneStreamErrorCode.Success)
+            {
+                Debug.Log($"Failed to initialize the microphone stream. {result}");
+                return;
+            }
         }
 
         public void StartMic()
         {
             if (useMic)
             {
-                //StartMicNormal();
-                StartMicMRTK();
+                if (useMRTK) StartMicMRTK(); else StartMicNormal();
+                
             }
             else
             {
@@ -130,10 +131,21 @@ namespace PianoTesisGameplay
             Debug.Log(result);
         }
 
+        IEnumerator CaptureMic()
+        {
+            micValues = Microphone.devices;
+            defaultMic = micValues[0].ToString();
+            _audioSource.outputAudioMixerGroup = mixerGroupMic;
+            _audioSource.clip = Microphone.Start(defaultMic, true, 1, sampleRate);
+            _audioSource.loop = true;
+            while (!(Microphone.GetPosition(null) > 0)) {}
+            _audioSource.Play();
+            yield return null;
+        }
+
         public void StopMic()
         {
-            //StopMicNormal();
-            StopMicMRTK();
+            if (useMRTK) StopMicMRTK(); else StopMicNormal();
         }
 
         private void StopMicNormal()
@@ -154,18 +166,6 @@ namespace PianoTesisGameplay
             // Uninitialize the microphone stream.
             micStream.Uninitialize();
             micStream = null;
-        }
-
-        IEnumerator CaptureMic()
-        {
-            micValues = Microphone.devices;
-            defaultMic = micValues[0].ToString();
-            _audioSource.outputAudioMixerGroup = mixerGroupMic;
-            _audioSource.clip = Microphone.Start(defaultMic, true, 1, sampleRate);
-            _audioSource.loop = true;
-            while (!(Microphone.GetPosition(null) > 0)) {}
-            _audioSource.Play();
-            yield return null;
         }
 
         public void CleanMic()
@@ -223,7 +223,7 @@ namespace PianoTesisGameplay
             for (int i = 0; i < fftSize; i++)
             {
                 // filter noise and insignificant harmonics
-                if (_samples[i] < 0.01f)
+                if (_samples[i] < noiseLevel)
                     continue;
 
                 curVal = _samples[i];
@@ -263,11 +263,12 @@ namespace PianoTesisGameplay
                 prevVal = curVal;
             }
 
-            //Debug.Log("====");
+            /*
+            Debug.Log("====");
             foreach (NotePeak kvp in pitchValues)
             {
                 Debug.Log("Key = " + kvp.key + " Freq = " + kvp.freq + " Value = " + kvp.val);
-            }
+            }*/
         }
 
         public void ClearPitchValues()

@@ -317,12 +317,12 @@ namespace PianoTesisGameplay
         private void ShowResults()
         {
             SaveLog();
+            return;
 
             foreach (KeyValuePair<String, NotePlayStatistics> note in notePlayStats)
             {
                 Debug.Log(note.Key.ToString() + ": " + note.Value.totalHit + " / " + note.Value.total);
             }
-            //throw new NotImplementedException();
         }
 
         private void SaveLog()
@@ -359,12 +359,11 @@ namespace PianoTesisGameplay
         private void ValidateNote()
         {
             if (gMic.pitchValues.Count == 0) return;
-
+            
             foreach (NotePeak notePeak in gMic.pitchValues)
             {
                 foreach (GameplayNote gameNote in validationLine.notes)
                 {
-                    Debug.Log(HelperPianoFreq.getLabelFromMIDI(gameNote.note.Value));
                     // if any of the peaks the same, then the note is played
                     if (notePeak.key == HelperPianoFreq.getLabelFromMIDI(gameNote.note.Value))
                     {

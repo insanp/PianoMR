@@ -19870,8 +19870,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3257378929780560224, guid: f00c8d8d8cb22d14eb73836631ba50a0,
         type: 3}
+      propertyPath: useMRTK
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560224, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
       propertyPath: debugText
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560225, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3257378929780560225, guid: f00c8d8d8cb22d14eb73836631ba50a0,
         type: 3}
