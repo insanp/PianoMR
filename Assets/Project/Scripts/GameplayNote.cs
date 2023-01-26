@@ -26,6 +26,8 @@ namespace PianoTesisGameplay
         [SerializeField] public Material matWhiteKey;
         [SerializeField] public Material matPlayed;
 
+        [SerializeField] GameObject VFXCorrect;
+
         public Vector3 targetVector;
 
         private void Start()
@@ -67,6 +69,10 @@ namespace PianoTesisGameplay
             }
             if (transform.position.y < -2f || correctNote)
             {
+                if (correctNote)
+                {
+                    CreateVFXHit();
+                }
                 Destroy(this.gameObject);
             }
 
@@ -83,6 +89,11 @@ namespace PianoTesisGameplay
         public void CorrectNote()
         {
             correctNote = true;
+        }
+
+        private void CreateVFXHit()
+        {
+            Instantiate(VFXCorrect, transform.position, Quaternion.identity);
         }
     }
 }

@@ -134,6 +134,7 @@ namespace PianoTesisGameplay
         IEnumerator CaptureMic()
         {
             micValues = Microphone.devices;
+            Debug.Log(string.Join(", ", micValues));
             defaultMic = micValues[0].ToString();
             _audioSource.outputAudioMixerGroup = mixerGroupMic;
             _audioSource.clip = Microphone.Start(defaultMic, true, 1, sampleRate);
