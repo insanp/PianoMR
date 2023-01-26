@@ -1,3 +1,4 @@
+using Microsoft.MixedReality.Toolkit.Audio;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,12 +9,13 @@ using UnityEngine.Audio;
 
 namespace PianoTesisGameplay
 {
-
+    [RequireComponent(typeof(AudioSource))]
     public class GameplayMic : MonoBehaviour
     {
         public bool useMic;
         private AudioSource _audioSource;
         public AudioMixerGroup mixerGroupMic, mixerGroupMaster;
+        private WindowsMicrophoneStream micStream = null;
 
         [SerializeField] public string defaultMic;
 
@@ -33,6 +35,26 @@ namespace PianoTesisGameplay
 
         public List<NotePeak> pitchValues = new List<NotePeak>();
         public String[] micValues;
+
+        private void InitializeMicMRTK()
+        {
+            micStream = new WindowsMicrophoneStream();
+
+            if (micStream == null)
+            {
+                Debug.Log("Failed to create the Windows Microphone Stream object");
+            }
+
+            micStream.Gain = 1.0f;
+
+            // Initialize the microphone stream.
+            WindowsMicrophoneStreamErrorCode result = micStream.Initialize(WindowsMicrophoneStreamType.RoomCapture);
+            if (result != WindowsMicrophoneStreamErrorCode.Success)
+            {
+                Debug.Log($"Failed to initialize the microphone stream. {result}");
+                return;
+            }
+        }
 
         // Start is called before the first frame update
         void Start()
@@ -70,15 +92,8 @@ namespace PianoTesisGameplay
         {
             if (useMic)
             {
-                if (Microphone.devices.Length > 0)
-                {
-                    StartCoroutine(CaptureMic());
-                    //MicInitialize()
-                }
-                else
-                {
-                    useMic = false;
-                }
+                //StartMicNormal();
+                StartMicMRTK();
             }
             else
             {
@@ -86,10 +101,59 @@ namespace PianoTesisGameplay
             }
         }
 
+        private void StartMicNormal()
+        {
+            if (Microphone.devices.Length > 0)
+            {
+                StartCoroutine(CaptureMic());
+            }
+            else
+            {
+                useMic = false;
+            }
+        }
+
+        private void StartMicMRTK()
+        {
+            InitializeMicMRTK();
+
+            _audioSource.outputAudioMixerGroup = mixerGroupMic;
+
+            // Start the microphone stream.
+            // Do not keep the data and do not preview.
+            WindowsMicrophoneStreamErrorCode result = micStream.StartStream(false, true);
+            if (result != WindowsMicrophoneStreamErrorCode.Success)
+            {
+                Debug.Log($"Failed to start the microphone stream. {result}");
+                useMic = false;
+            }
+            Debug.Log(result);
+        }
+
         public void StopMic()
+        {
+            //StopMicNormal();
+            StopMicMRTK();
+        }
+
+        private void StopMicNormal()
         {
             StopCoroutine(CaptureMic());
             CleanMic();
+        }
+
+        private void StopMicMRTK()
+        {
+            // Stop the microphone stream.
+            WindowsMicrophoneStreamErrorCode result = micStream.StopStream();
+            if (result != WindowsMicrophoneStreamErrorCode.Success)
+            {
+                Debug.Log($"Failed to stop the microphone stream. {result}");
+            }
+
+            // Uninitialize the microphone stream.
+            micStream.Uninitialize();
+            micStream = null;
         }
 
         IEnumerator CaptureMic()
@@ -110,6 +174,34 @@ namespace PianoTesisGameplay
             _audioSource.clip = null;
             _audioSource.loop = false;
             Microphone.End(defaultMic);
+        }
+
+        private void OnAudioFilterRead(float[] buffer, int numChannels)
+        {
+            if (micStream == null) { return; }
+
+            // Read the microphone stream data.
+            WindowsMicrophoneStreamErrorCode result = micStream.ReadAudioFrame(buffer, numChannels);
+            if (result != WindowsMicrophoneStreamErrorCode.Success)
+            {
+                Debug.Log($"Failed to read the microphone stream data. {result}");
+            }
+
+            float sumOfValues = 0;
+
+            // Calculate this frame's average amplitude.
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                if (float.IsNaN(buffer[i]))
+                {
+                    buffer[i] = 0;
+                }
+
+                buffer[i] = Mathf.Clamp(buffer[i], -1.0f, 1.0f);
+                sumOfValues += Mathf.Clamp01(Mathf.Abs(buffer[i]));
+            }
+
+            Debug.Log(sumOfValues / buffer.Length);
         }
 
         private void GetSpectrumAudioSource()

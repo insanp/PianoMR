@@ -45,7 +45,7 @@ namespace PianoTesisGameplay
 
         public enum GameMode
         {
-            NONE, PLAY, TRAIN, WATCH
+            ANALYZE, PLAY, TRAIN, WATCH
         }
 
         public GameMode mode;
@@ -148,7 +148,7 @@ namespace PianoTesisGameplay
                             noteview.note = mptkEvent; // the midi event is attached to the gameobject, will be played more later
                             noteview.gameObject.GetComponent<Renderer>().material = MatNewNote;
 
-                            if (mode != GameMode.WATCH) noteview.canSound = false;
+                            if (mode == GameMode.PLAY || mode == GameMode.TRAIN) noteview.canSound = false;
 
                             noteview.transform.position = position;
                             noteview.transform.rotation = Quaternion.identity;
@@ -341,6 +341,9 @@ namespace PianoTesisGameplay
         {
             switch (mode)
             {
+                case GameMode.ANALYZE:
+                    ValidateNote();
+                    break;
                 case GameMode.PLAY:
                     ValidateNote();
                     break;
@@ -390,13 +393,19 @@ namespace PianoTesisGameplay
         {
             switch (val) {
                 case 0:
-                    mode = GameMode.NONE;
+                    mode = GameMode.ANALYZE;
+                    gMic.StartMic();
+                    gMic.DetermineNoiseLevel();
                     break;
                 case 1:
                     mode = GameMode.PLAY;
+                    gMic.StartMic();
+                    gMic.DetermineNoiseLevel();
                     break;
                 case 2:
                     mode = GameMode.TRAIN;
+                    gMic.StartMic();
+                    gMic.DetermineNoiseLevel();
                     break;
                 case 3:
                 default:
@@ -415,6 +424,7 @@ namespace PianoTesisGameplay
             Clear();
             midiFilePlayer.MPTK_Stop();
             isPlaying = false;
+            gMic.StopMic();
         }
 
         public void InitializeNotePlayStats()
