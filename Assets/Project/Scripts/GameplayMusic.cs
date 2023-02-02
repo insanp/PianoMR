@@ -5,6 +5,8 @@ using MidiPlayerTK;
 using System;
 using UnityEngine.Events;
 using System.IO;
+using Newtonsoft.Json;
+using System.Dynamic;
 
 namespace PianoTesisGameplay
 {
@@ -316,13 +318,8 @@ namespace PianoTesisGameplay
 
         private void ShowResults()
         {
+            StopSong();
             SaveLog();
-            return;
-
-            foreach (KeyValuePair<String, NotePlayStatistics> note in notePlayStats)
-            {
-                Debug.Log(note.Key.ToString() + ": " + note.Value.totalHit + " / " + note.Value.total);
-            }
         }
 
         private void SaveLog()
@@ -331,10 +328,32 @@ namespace PianoTesisGameplay
                 "_" + DateTimeOffset.Now.ToUnixTimeSeconds() + ".txt";
 
             StreamWriter writer = new(path, true);
-            writer.WriteLine("Test");
+
+            string data = CreateResultJSON();
+            writer.WriteLine(data);
             writer.Close();
 
             Debug.Log(path);
+        }
+
+        private string CreateResultJSON()
+        {
+            dynamic result = new ExpandoObject();
+            result.Title = midiFilePlayer.MPTK_MidiName;
+            result.SampleRate = gMic.sampleRate;
+            result.DSPBufferSize = gMic.DSPBufferSize;
+            result.FFTSize = gMic.fftSize;
+            result.NoiseSize = gMic.noiseLevel;
+            result.MinLatency = (float)GameplayMic.minLatency / (float)gMic.sampleRate;
+            result.MaxLatency = (float)GameplayMic.maxLatency / (float)gMic.sampleRate;
+            result.NumLatencyArtifacts = gMic.numArtifacts;
+            result.NoteSummary = new ExpandoObject();
+            result.NoteSummary.Total = totalNotes;
+            result.NoteSummary.TotalHit = totalHitNotes;
+            result.NoteSummary.TotalMiss = totalMissNotes;
+            result.NoteStats = notePlayStats;
+
+            return JsonConvert.SerializeObject(result);
         }
 
         private void ExecuteGameMode()

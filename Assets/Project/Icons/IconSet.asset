@@ -22,6 +22,8 @@ MonoBehaviour:
   - {fileID: 2800000, guid: f8b457c9d99a543449fe1bd372c62c55, type: 3}
   - {fileID: 2800000, guid: 2f18ab84d86bf0c419bdec640960867e, type: 3}
   - {fileID: 2800000, guid: fcdfeef7c23cdd949b1e748c36604493, type: 3}
+  - {fileID: 2800000, guid: d0a11ad7c7ffae7429b0ab5b349de1a9, type: 3}
+  - {fileID: 2800000, guid: 44338ca6b1a6dcf42ade9a31b55c8867, type: 3}
   spriteIcons: []
   charIconFont: {fileID: 0}
   charIcons:

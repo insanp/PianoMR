@@ -6,6 +6,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 
 namespace PianoTesisGameplay
 {
@@ -21,18 +22,26 @@ namespace PianoTesisGameplay
         [SerializeField] public string defaultMic;
 
         // FFT Values
-        public int sampleRate; // for finer frequency with lower samples
-        public int fftSize = 4096;
-        public int pianoFreqSize;
+        [SerializeField] public int sampleRate = 48000; // for finer frequency with lower samples
+        [SerializeField] public int fftSize = 4096; // 2048, 4096, 8192
+        [SerializeField] public int pianoFreqSize;
+        [SerializeField] public int DSPBufferSize = 256;
         public float[] _samples;
         public float[] _freqBand;
         public float noiseLevel = 0.01f;
+        public int numArtifacts = 0;
         public float time;
 
         private float freqStep;
         private float[] _bandBuffer = new float[512];
         private float[] _bufferDecrease = new float[512];
         private float[] _freqBandHighest = new float[8];
+
+        // for calculating latency
+        public static int readPosition = 0;
+        public static int minLatency = 0;
+        public static int maxLatency = 0;
+        public static int prevWritePosition = 0;
 
         public List<NotePeak> pitchValues = new List<NotePeak>();
         public String[] micValues;
@@ -41,7 +50,6 @@ namespace PianoTesisGameplay
         void Start()
         {
             _audioSource = GetComponent<AudioSource>();
-            sampleRate = AudioSettings.outputSampleRate;
             pianoFreqSize = HelperPianoFreq.keys.Length;
 
             _samples = new float[fftSize];
@@ -93,6 +101,7 @@ namespace PianoTesisGameplay
         {
             if (useMic)
             {
+                //SetupGlobalAudio();
                 if (useMRTK) StartMicMRTK(); else StartMicNormal();
                 
             }
@@ -138,9 +147,14 @@ namespace PianoTesisGameplay
             defaultMic = micValues[0].ToString();
             _audioSource.outputAudioMixerGroup = mixerGroupMic;
             _audioSource.clip = Microphone.Start(defaultMic, true, 1, sampleRate);
+            while (!(Microphone.GetPosition(defaultMic) > 0)) { }
             _audioSource.loop = true;
-            while (!(Microphone.GetPosition(null) > 0)) {}
-            _audioSource.Play();
+            _audioSource.PlayDelayed(0.001f);
+            minLatency = 99999;
+            maxLatency = 0;
+            readPosition = 0;
+            prevWritePosition = 0;
+            numArtifacts = 0;
             yield return null;
         }
 
@@ -152,6 +166,7 @@ namespace PianoTesisGameplay
         private void StopMicNormal()
         {
             StopCoroutine(CaptureMic());
+            StopAllCoroutines();
             CleanMic();
         }
 
@@ -179,30 +194,55 @@ namespace PianoTesisGameplay
 
         private void OnAudioFilterRead(float[] buffer, int numChannels)
         {
-            if (micStream == null) { return; }
-
-            // Read the microphone stream data.
-            WindowsMicrophoneStreamErrorCode result = micStream.ReadAudioFrame(buffer, numChannels);
-            if (result != WindowsMicrophoneStreamErrorCode.Success)
+            if (useMRTK)
             {
-                Debug.Log($"Failed to read the microphone stream data. {result}");
-            }
+                if (micStream == null) { return; }
 
-            float sumOfValues = 0;
-
-            // Calculate this frame's average amplitude.
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                if (float.IsNaN(buffer[i]))
+                // Read the microphone stream data.
+                WindowsMicrophoneStreamErrorCode result = micStream.ReadAudioFrame(buffer, numChannels);
+                if (result != WindowsMicrophoneStreamErrorCode.Success)
                 {
-                    buffer[i] = 0;
+                    Debug.Log($"Failed to read the microphone stream data. {result}");
                 }
 
-                buffer[i] = Mathf.Clamp(buffer[i], -1.0f, 1.0f);
-                sumOfValues += Mathf.Clamp01(Mathf.Abs(buffer[i]));
-            }
+                float sumOfValues = 0;
 
-            Debug.Log(sumOfValues / buffer.Length);
+                // Calculate this frame's average amplitude.
+                for (int i = 0; i < buffer.Length; i++)
+                {
+                    if (float.IsNaN(buffer[i]))
+                    {
+                        buffer[i] = 0;
+                    }
+
+                    buffer[i] = Mathf.Clamp(buffer[i], -1.0f, 1.0f);
+                    sumOfValues += Mathf.Clamp01(Mathf.Abs(buffer[i]));
+                }
+
+                Debug.Log(sumOfValues / buffer.Length);
+            } else
+            {
+                // normal microphone, analyze latency
+                readPosition += buffer.Length;
+                int writePosition = Microphone.GetPosition(defaultMic);
+
+                if (writePosition < prevWritePosition)    //Check if write buffer looped
+                {
+                    readPosition = buffer.Length;
+                }
+                // latency in samples
+                int latency = readPosition - writePosition;
+                if (latency > maxLatency)
+                    maxLatency = latency;
+
+                if (minLatency > latency)
+                    minLatency = latency;
+
+                if (latency < 0f) numArtifacts++;
+
+                prevWritePosition = writePosition;
+                Debug.Log("Read: " + (float)readPosition + " Write: " + (float)writePosition);
+            }
         }
 
         private void GetSpectrumAudioSource()
@@ -302,7 +342,7 @@ namespace PianoTesisGameplay
         IEnumerator CapturingNoise()
         {
             Debug.Log("Determining noise");
-            float captureTime = 3.0f;
+            float captureTime = 1.0f;
             float timer = 0.0f;
             int numSample = 1;
             float vol = _samples.Max();
@@ -407,6 +447,18 @@ namespace PianoTesisGameplay
 
                 _freqBand[i] = val * 10;
             }
+        }
+
+        public void SetupGlobalAudio()
+        {
+            AudioConfiguration config = AudioSettings.GetConfiguration();
+            config.dspBufferSize = (int)DSPBufferSize;  // 128, 256, 512
+            config.sampleRate = sampleRate;        // 11025, 22050, 44100, 48000, 88200, 96000
+            config.numVirtualVoices = 1;  // 1, 2, 4, 8, 16, 32, 50, 64, 100, 128, 256, 512
+            config.numRealVoices = 1;      // 1, 2, 4, 8, 16, 32, 50, 64, 100, 128, 256, 512
+            config.speakerMode = AudioSpeakerMode.Stereo;
+            AudioSettings.Reset(config);
+            //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 }

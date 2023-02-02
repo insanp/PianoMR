@@ -142,6 +142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useMic: 1
+  useMRTK: 0
   mixerGroupMic: {fileID: -7419542997518812155, guid: a822ed5b95b17364686b19326ce6feae,
     type: 2}
   mixerGroupMaster: {fileID: 24300002, guid: a822ed5b95b17364686b19326ce6feae, type: 2}
@@ -149,6 +150,8 @@ MonoBehaviour:
   sampleRate: 44100
   fftSize: 4096
   pianoFreqSize: 0
+  DSPBufferSize: 512
+  audioSampleRate: 96000
   _samples: []
   _freqBand: []
   noiseLevel: 0.01
