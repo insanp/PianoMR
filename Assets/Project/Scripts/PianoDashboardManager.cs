@@ -8,9 +8,13 @@ namespace PianoTesisGameplay
 {
     public class PianoDashboardManager : MonoBehaviour
     {
-        [SerializeField] GameObject CallibrationToggle;
-        [SerializeField] GameObject ShowKeysToggle;
-        [SerializeField] GameObject ThePiano;
+        [SerializeField] GameObject callibrationToggle;
+        [SerializeField] GameObject showKeysToggle;
+        [SerializeField] GameObject thePiano;
+
+        [SerializeField] GameObject dspBufferSizeRadial;
+        [SerializeField] GameObject sampleRateRadial;
+        [SerializeField] GameObject fftSizeRadial;
 
         [SerializeField] public TextMeshPro titleSong;
         [SerializeField] public TextMeshPro titleSongInMode;
@@ -23,20 +27,24 @@ namespace PianoTesisGameplay
         [SerializeField] public GameObject whiteKeys;
 
         private GameplayMusic gMusic;
+        private GameplayMic gMic;
 
         // Start is called before the first frame update
         void Start()
         {
             gMusic = FindObjectOfType<GameplayMusic>();
+            gMic = FindObjectOfType<GameplayMic>();
             ToggleMovePiano();
             ToggleShowKeys();
             UpdateTitleSong();
+            InitializeSetupAudio();
         }
 
         // Update is called once per frame
         void Update()
         {
             UpdateTotalNotesPlay();
+            //InitializeSetupAudio();
         }
 
         public void UpdateTitleSong()
@@ -53,18 +61,18 @@ namespace PianoTesisGameplay
 
         public void ToggleMovePiano()
         {
-            if (CallibrationToggle.GetComponent<Interactable>().IsToggled)
+            if (callibrationToggle.GetComponent<Interactable>().IsToggled)
             {
-                ThePiano.GetComponent<ObjectManipulator>().enabled = true;
+                thePiano.GetComponent<ObjectManipulator>().enabled = true;
             } else
             {
-                ThePiano.GetComponent<ObjectManipulator>().enabled = false;
+                thePiano.GetComponent<ObjectManipulator>().enabled = false;
             }
         }
 
         public void ToggleShowKeys()
         {
-            if (ShowKeysToggle.GetComponent<Interactable>().IsToggled)
+            if (showKeysToggle.GetComponent<Interactable>().IsToggled)
             {
                 blackKeys.SetActive(true);
                 whiteKeys.SetActive(true);
@@ -79,6 +87,22 @@ namespace PianoTesisGameplay
         public void StopSong()
         {
             gMusic.StopSong();
+        }
+
+        public void InitializeSetupAudio()
+        {
+            // all hardcoded default to 256 DSP buffer size, 48000 Hz, 4096 FFT size
+            dspBufferSizeRadial.GetComponent<InteractableToggleCollection>().SetSelection(1, true);
+            sampleRateRadial.GetComponent<InteractableToggleCollection>().SetSelection(1, true);
+            fftSizeRadial.GetComponent<InteractableToggleCollection>().SetSelection(1, true);
+        }
+
+        public void ApplySetupAudio()
+        {
+            gMic.dspBufferSize = HelperAudioSetting.dspBufferSizes[dspBufferSizeRadial.GetComponent<InteractableToggleCollection>().CurrentIndex];
+            gMic.sampleRate = HelperAudioSetting.sampleRates[sampleRateRadial.GetComponent<InteractableToggleCollection>().CurrentIndex];
+            gMic.fftSize = HelperAudioSetting.fftSizes[fftSizeRadial.GetComponent<InteractableToggleCollection>().CurrentIndex];
+            gMic.SetupGlobalAudio();
         }
     }
 }

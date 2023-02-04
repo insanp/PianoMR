@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3257378929780560239}
-  - component: {fileID: 3257378929780560225}
   - component: {fileID: 3257378929780560224}
+  - component: {fileID: 3257378929780560225}
   m_Layer: 0
   m_Name: Gameplay Mic
   m_TagString: Untagged
@@ -33,6 +33,34 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3257378929780560224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3257378929780560226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ee98db901a4004469c0571d6ea298c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useMic: 1
+  useMRTK: 0
+  mixerGroupMic: {fileID: -7419542997518812155, guid: a822ed5b95b17364686b19326ce6feae,
+    type: 2}
+  mixerGroupMaster: {fileID: 24300002, guid: a822ed5b95b17364686b19326ce6feae, type: 2}
+  defaultMic: 
+  sampleRate: 48000
+  fftSize: 4096
+  pianoFreqSize: 0
+  DSPBufferSize: 512
+  _samples: []
+  _freqBand: []
+  noiseLevel: 0.01
+  numArtifacts: 0
+  time: 0
+  micValues: []
 --- !u!82 &3257378929780560225
 AudioSource:
   m_ObjectHideFlags: 0
@@ -129,31 +157,3 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &3257378929780560224
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3257378929780560226}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ee98db901a4004469c0571d6ea298c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useMic: 1
-  useMRTK: 0
-  mixerGroupMic: {fileID: -7419542997518812155, guid: a822ed5b95b17364686b19326ce6feae,
-    type: 2}
-  mixerGroupMaster: {fileID: 24300002, guid: a822ed5b95b17364686b19326ce6feae, type: 2}
-  defaultMic: 
-  sampleRate: 44100
-  fftSize: 4096
-  pianoFreqSize: 0
-  DSPBufferSize: 512
-  audioSampleRate: 96000
-  _samples: []
-  _freqBand: []
-  noiseLevel: 0.01
-  time: 0
-  micValues: []

@@ -20,7 +20,8 @@ namespace PianoTesisGameplay
         public bool played = false;
         public bool correctNote = false;
         public bool isSharp = false;
-        public bool canSound = true;
+        public bool canSoundOnHit = true;
+        public bool canAutoSoundOnValidationLine = false;
 
         [SerializeField] public Material matBlackKey;
         [SerializeField] public Material matWhiteKey;
@@ -34,6 +35,7 @@ namespace PianoTesisGameplay
         {
             played = false;
             correctNote = false;
+            canAutoSoundOnValidationLine = false;
             if (MidiPlayerTK.HelperNoteLabel.IsSharp(note.Value))
             {
                 isSharp = true;
@@ -61,7 +63,7 @@ namespace PianoTesisGameplay
                 played = true;
 
                 // Now play the note with a MidiStreamPlayer prefab
-                if (canSound) midiStreamPlayer.MPTK_PlayEvent(note);
+                if (canSoundOnHit) midiStreamPlayer.MPTK_PlayEvent(note);
                 //! [Example PlayNote]
                 FirstNotePlayed = true;
 
@@ -94,6 +96,11 @@ namespace PianoTesisGameplay
         private void CreateVFXHit()
         {
             Instantiate(VFXCorrect, transform.position, Quaternion.identity);
+        }
+
+        public void ForcePlayNote()
+        {
+            midiStreamPlayer.MPTK_PlayEvent(note);
         }
     }
 }

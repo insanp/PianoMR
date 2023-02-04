@@ -150,7 +150,8 @@ namespace PianoTesisGameplay
                             noteview.note = mptkEvent; // the midi event is attached to the gameobject, will be played more later
                             noteview.gameObject.GetComponent<Renderer>().material = MatNewNote;
 
-                            if (mode == GameMode.PLAY || mode == GameMode.TRAIN) noteview.canSound = false;
+                            if (mode == GameMode.PLAY || mode == GameMode.TRAIN || mode == GameMode.ANALYZE) noteview.canSoundOnHit = false;
+                            if (mode == GameMode.ANALYZE) noteview.canAutoSoundOnValidationLine = true;
 
                             noteview.transform.position = position;
                             noteview.transform.rotation = Quaternion.identity;
@@ -341,7 +342,7 @@ namespace PianoTesisGameplay
             dynamic result = new ExpandoObject();
             result.Title = midiFilePlayer.MPTK_MidiName;
             result.SampleRate = gMic.sampleRate;
-            result.DSPBufferSize = gMic.DSPBufferSize;
+            result.DSPBufferSize = gMic.dspBufferSize;
             result.FFTSize = gMic.fftSize;
             result.NoiseSize = gMic.noiseLevel;
             result.MinLatency = (float)GameplayMic.minLatency / (float)gMic.sampleRate;
@@ -442,7 +443,7 @@ namespace PianoTesisGameplay
             Clear();
             midiFilePlayer.MPTK_Stop();
             isPlaying = false;
-            gMic.StopMic();
+            if (mode != GameMode.WATCH) gMic.StopMic();
         }
 
         public void InitializeNotePlayStats()

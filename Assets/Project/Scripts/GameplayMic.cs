@@ -25,7 +25,7 @@ namespace PianoTesisGameplay
         [SerializeField] public int sampleRate = 48000; // for finer frequency with lower samples
         [SerializeField] public int fftSize = 4096; // 2048, 4096, 8192
         [SerializeField] public int pianoFreqSize;
-        [SerializeField] public int DSPBufferSize = 256;
+        [SerializeField] public int dspBufferSize = 512;
         public float[] _samples;
         public float[] _freqBand;
         public float noiseLevel = 0.01f;
@@ -56,6 +56,8 @@ namespace PianoTesisGameplay
             _freqBand = new float[pianoFreqSize];
 
             freqStep = sampleRate / _samples.Length;
+
+            //SetupGlobalAudio();
         }
         
         // Update is called once per frame
@@ -67,13 +69,12 @@ namespace PianoTesisGameplay
                 {
                     _audioSource.Play();
                 }
+                GetSpectrumAudioSource();
+                //MakeFrequencyBands();
+                //CheckMaxFrequencyFromSample();
+                //AnalyzePitch();
+                AnalyzeMultiPitch();
             }
-
-            GetSpectrumAudioSource();
-            //MakeFrequencyBands();
-            //CheckMaxFrequencyFromSample();
-            //AnalyzePitch();
-            AnalyzeMultiPitch();
         }
 
         private void InitializeMicMRTK()
@@ -241,7 +242,7 @@ namespace PianoTesisGameplay
                 if (latency < 0f) numArtifacts++;
 
                 prevWritePosition = writePosition;
-                Debug.Log("Read: " + (float)readPosition + " Write: " + (float)writePosition);
+                //Debug.Log("Read: " + (float)readPosition + " Write: " + (float)writePosition);
             }
         }
 
@@ -253,7 +254,6 @@ namespace PianoTesisGameplay
         private void AnalyzeMultiPitch()
         {
             float curVal = 0;
-            var maxN = 0;
             int prevIndex = 0;
             float prevVal = 0f;
             bool passedPeak = false;
@@ -452,13 +452,13 @@ namespace PianoTesisGameplay
         public void SetupGlobalAudio()
         {
             AudioConfiguration config = AudioSettings.GetConfiguration();
-            config.dspBufferSize = (int)DSPBufferSize;  // 128, 256, 512
+            config.dspBufferSize = (int)dspBufferSize;  // 128, 256, 512
             config.sampleRate = sampleRate;        // 11025, 22050, 44100, 48000, 88200, 96000
-            config.numVirtualVoices = 1;  // 1, 2, 4, 8, 16, 32, 50, 64, 100, 128, 256, 512
-            config.numRealVoices = 1;      // 1, 2, 4, 8, 16, 32, 50, 64, 100, 128, 256, 512
+            config.numVirtualVoices = 512;  // 1, 2, 4, 8, 16, 32, 50, 64, 100, 128, 256, 512
+            config.numRealVoices = 32;      // 1, 2, 4, 8, 16, 32, 50, 64, 100, 128, 256, 512
             config.speakerMode = AudioSpeakerMode.Stereo;
             AudioSettings.Reset(config);
-            //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 }
