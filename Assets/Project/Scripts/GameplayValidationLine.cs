@@ -44,12 +44,6 @@ namespace PianoTesisGameplay {
                 } else
                 {
                     notes.Add(note);
-
-                    // auto sound from midi stream playback for analyzing
-                    if (gMusic.mode == GameplayMusic.GameMode.ANALYZE)
-                    {
-                        note.ForcePlayNote();
-                    }
                 }
             }
         }
