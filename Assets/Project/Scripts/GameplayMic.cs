@@ -26,6 +26,8 @@ namespace PianoTesisGameplay
         [SerializeField] public int fftSize = 4096; // 2048, 4096, 8192
         [SerializeField] public int pianoFreqSize;
         [SerializeField] public int dspBufferSize = 512;
+        [SerializeField] public FFTWindow fftWindow = FFTWindow.BlackmanHarris; // defaults to BlackmanHarris
+
         public float[] _samples;
         public float[] _freqBand;
         public float noiseLevel = 0.01f;
@@ -56,6 +58,11 @@ namespace PianoTesisGameplay
             _freqBand = new float[pianoFreqSize];
 
             freqStep = sampleRate / _samples.Length;
+
+            dspBufferSize = PlayerPrefs.GetInt("dspBufferSize", dspBufferSize);
+            sampleRate = PlayerPrefs.GetInt("sampleRate", sampleRate);
+            fftSize = PlayerPrefs.GetInt("fftSize", fftSize);
+            fftWindow = HelperAudioSetting.fftWindows[PlayerPrefs.GetInt("fftWindow", 3)];
 
             //SetupGlobalAudio();
         }
@@ -248,7 +255,7 @@ namespace PianoTesisGameplay
 
         private void GetSpectrumAudioSource()
         {
-            _audioSource.GetSpectrumData(_samples, 0, FFTWindow.BlackmanHarris);
+            _audioSource.GetSpectrumData(_samples, 0, fftWindow);
         }
 
         private void AnalyzeMultiPitch()

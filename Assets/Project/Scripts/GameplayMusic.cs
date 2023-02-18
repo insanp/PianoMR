@@ -344,6 +344,7 @@ namespace PianoTesisGameplay
             result.SampleRate = gMic.sampleRate;
             result.DSPBufferSize = gMic.dspBufferSize;
             result.FFTSize = gMic.fftSize;
+            result.FFTWindow = gMic.fftWindow.ToString();
             result.NoiseSize = gMic.noiseLevel;
             result.MinLatency = (float)GameplayMic.minLatency / (float)gMic.sampleRate;
             result.MaxLatency = (float)GameplayMic.maxLatency / (float)gMic.sampleRate;

@@ -23,6 +23,9 @@ namespace PianoTesisGameplay
         public bool canSoundOnHit = true;
         public bool canAutoSoundOnValidationLine = false;
 
+        public bool isBeingValidated = false;
+        public float timeValidated = 0.0f;
+
         [SerializeField] public Material matBlackKey;
         [SerializeField] public Material matWhiteKey;
         [SerializeField] public Material matPlayed;
@@ -36,6 +39,7 @@ namespace PianoTesisGameplay
             played = false;
             correctNote = false;
             canAutoSoundOnValidationLine = false;
+            timeValidated = 0.0f;
             if (MidiPlayerTK.HelperNoteLabel.IsSharp(note.Value))
             {
                 isSharp = true;
@@ -57,6 +61,7 @@ namespace PianoTesisGameplay
         /// </summary>
         public void Update()
         {
+            //if (isBeingValidated) timeValidated += Time.deltaTime;
             // The midi event is played with a MidiStreamPlayer when position X < -45 (falling)
             if (!played && correctNote) //transform.position.y < 10f)
             {
@@ -101,6 +106,11 @@ namespace PianoTesisGameplay
         public void ForcePlayNote()
         {
             midiStreamPlayer.MPTK_PlayEvent(note);
+        }
+
+        private void OnDestroy()
+        {
+            //Debug.Log("Destroyed at " + timeValidated);
         }
     }
 }

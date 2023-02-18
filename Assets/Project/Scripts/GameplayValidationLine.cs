@@ -37,6 +37,7 @@ namespace PianoTesisGameplay {
             {
                 GameplayNote note = collision.GetComponent<GameplayNote>();
                 note.GetComponent<Renderer>().material.color = Color.red;
+                note.isBeingValidated = true;
                 if (gMusic.mode == GameplayMusic.GameMode.WATCH)
                 {
                     note.CorrectNote();

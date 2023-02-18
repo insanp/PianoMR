@@ -16,6 +16,7 @@
     <string>Bach - Toccata in D minor Piano</string>
     <string>Debussy - Clair De Lune</string>
     <string>Happy Birthday</string>
+    <string>Level 5 - La Campanella by Liszt</string>
     <string>Liszt - La Campanella</string>
     <string>Ode To Joy</string>
     <string>One Direction - They Dont Know About Us</string>

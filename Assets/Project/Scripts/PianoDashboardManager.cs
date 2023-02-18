@@ -1,4 +1,5 @@
 using Microsoft.MixedReality.Toolkit.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -15,6 +16,7 @@ namespace PianoTesisGameplay
         [SerializeField] GameObject dspBufferSizeRadial;
         [SerializeField] GameObject sampleRateRadial;
         [SerializeField] GameObject fftSizeRadial;
+        [SerializeField] GameObject fftWindowRadial;
 
         [SerializeField] public TextMeshPro titleSong;
         [SerializeField] public TextMeshPro titleSongInMode;
@@ -25,6 +27,7 @@ namespace PianoTesisGameplay
 
         [SerializeField] public GameObject blackKeys;
         [SerializeField] public GameObject whiteKeys;
+        [SerializeField] public GameObject markers;
 
         private GameplayMusic gMusic;
         private GameplayMic gMic;
@@ -74,13 +77,11 @@ namespace PianoTesisGameplay
         {
             if (showKeysToggle.GetComponent<Interactable>().IsToggled)
             {
-                blackKeys.SetActive(true);
-                whiteKeys.SetActive(true);
+                markers.SetActive(true);
             }
             else
             {
-                blackKeys.SetActive(false);
-                whiteKeys.SetActive(false);
+                markers.SetActive(false);
             }
         }
 
@@ -91,10 +92,11 @@ namespace PianoTesisGameplay
 
         public void InitializeSetupAudio()
         {
-            // all hardcoded default to 256 DSP buffer size, 48000 Hz, 4096 FFT size
-            dspBufferSizeRadial.GetComponent<InteractableToggleCollection>().SetSelection(1, true);
-            sampleRateRadial.GetComponent<InteractableToggleCollection>().SetSelection(1, true);
-            fftSizeRadial.GetComponent<InteractableToggleCollection>().SetSelection(1, true);
+            // all hardcoded default to 256 DSP buffer size, 48000 Hz, 4096 FFT size and BlackmanHarris
+            dspBufferSizeRadial.GetComponent<InteractableToggleCollection>().SetSelection(Array.IndexOf(HelperAudioSetting.dspBufferSizes, gMic.dspBufferSize), true);
+            sampleRateRadial.GetComponent<InteractableToggleCollection>().SetSelection(Array.IndexOf(HelperAudioSetting.sampleRates, gMic.sampleRate), true);
+            fftSizeRadial.GetComponent<InteractableToggleCollection>().SetSelection(Array.IndexOf(HelperAudioSetting.fftSizes, gMic.fftSize), true);
+            fftWindowRadial.GetComponent<InteractableToggleCollection>().SetSelection(Array.IndexOf(HelperAudioSetting.fftWindows, gMic.fftWindow), true);
         }
 
         public void ApplySetupAudio()
@@ -102,6 +104,13 @@ namespace PianoTesisGameplay
             gMic.dspBufferSize = HelperAudioSetting.dspBufferSizes[dspBufferSizeRadial.GetComponent<InteractableToggleCollection>().CurrentIndex];
             gMic.sampleRate = HelperAudioSetting.sampleRates[sampleRateRadial.GetComponent<InteractableToggleCollection>().CurrentIndex];
             gMic.fftSize = HelperAudioSetting.fftSizes[fftSizeRadial.GetComponent<InteractableToggleCollection>().CurrentIndex];
+            gMic.fftWindow = HelperAudioSetting.fftWindows[fftWindowRadial.GetComponent<InteractableToggleCollection>().CurrentIndex];
+
+            PlayerPrefs.SetInt("dspBufferSize", gMic.dspBufferSize);
+            PlayerPrefs.SetInt("sampleRate", gMic.sampleRate);
+            PlayerPrefs.SetInt("fftSize", gMic.fftSize);
+            PlayerPrefs.SetInt("fftWindow", fftWindowRadial.GetComponent<InteractableToggleCollection>().CurrentIndex);
+
             gMic.SetupGlobalAudio();
         }
     }
