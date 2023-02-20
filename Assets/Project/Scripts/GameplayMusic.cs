@@ -40,8 +40,11 @@ namespace PianoTesisGameplay
         public int totalNotes;
         public int totalHitNotes;
         public int totalMissNotes;
-
+        public float score;
+        private float thresholdLevelUp = 80f;
         public bool isPlaying;
+        public bool hasLeveledUp;
+        public PlayerData playerData;
 
         public Dictionary<string, NotePlayStatistics> notePlayStats;
 
@@ -79,6 +82,7 @@ namespace PianoTesisGameplay
             float planSize = 10f;
             Speed = speedMod;
             isPlaying = false;
+            hasLeveledUp = false;
 
             CalculateSemitoneDistance();
 
@@ -104,6 +108,7 @@ namespace PianoTesisGameplay
             // stop music at first
             PauseSpeed();
             InitializeNotePlayStats();
+            InitializePlayerData();
         }
 
         public void CalculateSemitoneDistance()
@@ -218,72 +223,6 @@ namespace PianoTesisGameplay
             PauseSpeed();
         }
 
-        void OnGUI()
-        {
-            //return;
-
-            int startx = 5;
-            int starty = 90;
-            int maxwidth = Screen.width;
-
-            if (!HelperDemo.CheckSFExists()) return;
-
-            if (midiFilePlayer != null)
-            {
-                GUILayout.BeginArea(new Rect(startx, starty, maxwidth, 200));
-
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button(new GUIContent("Previous", ""), GUILayout.Width(150)))
-                {
-                    PrevSong();
-                }
-                if (GUILayout.Button(new GUIContent("Next", ""), GUILayout.Width(150)))
-                {
-                    NextSong();
-                }
-                if (GUILayout.Button(new GUIContent("Clear", ""), GUILayout.Width(150)))
-                    Clear();
-                GUILayout.EndHorizontal();
-                GUILayout.Label("Midi '" + midiFilePlayer.MPTK_MidiName + (midiFilePlayer.MPTK_IsPlaying ? "' is playing" : " is not playing"));
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Midi Position :", GUILayout.Width(100));
-                double currentposition = Math.Round(midiFilePlayer.MPTK_Position / 1000d, 2);
-                double newposition = Math.Round(GUILayout.HorizontalSlider((float)currentposition, 0f, (float)midiFilePlayer.MPTK_DurationMS / 1000f, GUILayout.Width(200)), 2);
-                if (newposition != currentposition)
-                    midiFilePlayer.MPTK_Position = newposition * 1000d;
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Speed Music :", GUILayout.Width(100));
-                float speed = GUILayout.HorizontalSlider(midiFilePlayer.MPTK_Speed, 0.1f, 5f, GUILayout.Width(200));
-                if (speed != midiFilePlayer.MPTK_Speed) midiFilePlayer.MPTK_Speed = speed;
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Speed Note :", GUILayout.Width(100));
-                Speed = GUILayout.HorizontalSlider(Speed, 5f, 20f, GUILayout.Width(200));
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Camera Y:", GUILayout.Width(100));
-                float y = GUILayout.HorizontalSlider(Cam.transform.position.y, 50f, 150f, GUILayout.Width(200));
-                if (y != Cam.transform.position.y)
-                    Cam.transform.Translate(new Vector3(0, y - Cam.transform.position.y, 0), Space.World);
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Camera X:", GUILayout.Width(100));
-                float x = GUILayout.HorizontalSlider(Cam.transform.position.x, -50f, 50f, GUILayout.Width(200));
-                if (x != Cam.transform.position.x)
-                    Cam.transform.Translate(new Vector3(x - Cam.transform.position.x, 0, 0), Space.World);
-                GUILayout.EndHorizontal();
-
-                GUILayout.Label("Be careful with the notes traffic jam!!!");
-
-                GUILayout.EndArea();
-            }
-        }
-
         /// <summary>@brief
         /// Remove all gameobject Note on the screen
         /// </summary>
@@ -321,6 +260,12 @@ namespace PianoTesisGameplay
         {
             StopSong();
             SaveLog();
+            if (CheckLevelUp())
+            {
+                playerData.LevelUp();
+                SaveLoadManager.SavePlayerData(playerData);
+                hasLeveledUp = true;
+            }
         }
 
         private void SaveLog()
@@ -436,6 +381,7 @@ namespace PianoTesisGameplay
             ResetNotePlayStats();
             ResumeSpeed();
             isPlaying = true;
+            hasLeveledUp = false;
         }
 
         public void StopSong()
@@ -481,6 +427,31 @@ namespace PianoTesisGameplay
         {
             notePlayStats[label].AddTotal();
             totalNotes++;
+        }
+
+        private bool CheckLevelUp()
+        {
+            score = (float)Math.Round((float)totalHitNotes / (float)totalNotes * 100, 0);
+            Debug.Log(score);
+            if (score >= thresholdLevelUp) return true;
+
+            return false;
+        }
+
+        private void InitializePlayerData()
+        {
+            playerData = SaveLoadManager.LoadPlayerData();
+            if (playerData == null)
+            {
+                playerData = new PlayerData();
+                SaveLoadManager.SavePlayerData(playerData);
+            }
+        }
+
+        public void ResetPlayerData()
+        {
+            playerData.Initialize();
+            SaveLoadManager.SavePlayerData(playerData);
         }
     }
 }

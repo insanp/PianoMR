@@ -21,9 +21,14 @@ namespace PianoTesisGameplay
         [SerializeField] public TextMeshPro titleSong;
         [SerializeField] public TextMeshPro titleSongInMode;
         [SerializeField] public TextMeshPro titleSongInGameplay;
+        [SerializeField] public TextMeshPro songLevel;
 
         [SerializeField] public TextMeshPro totalHit;
         [SerializeField] public TextMeshPro totalMiss;
+
+        [SerializeField] public GameObject resultObject;
+        [SerializeField] public TextMeshPro resultScore;
+        [SerializeField] public GameObject levelUpSprite;
 
         [SerializeField] public GameObject blackKeys;
         [SerializeField] public GameObject whiteKeys;
@@ -40,6 +45,8 @@ namespace PianoTesisGameplay
             ToggleMovePiano();
             ToggleShowKeys();
             UpdateTitleSong();
+            UpdateDisplayLevel();
+            UpdateDisplaySongResults();
             InitializeSetupAudio();
         }
 
@@ -47,7 +54,8 @@ namespace PianoTesisGameplay
         void Update()
         {
             UpdateTotalNotesPlay();
-            //InitializeSetupAudio();
+            UpdateDisplayLevel();
+            UpdateDisplaySongResults();
         }
 
         public void UpdateTitleSong()
@@ -112,6 +120,30 @@ namespace PianoTesisGameplay
             PlayerPrefs.SetInt("fftWindow", fftWindowRadial.GetComponent<InteractableToggleCollection>().CurrentIndex);
 
             gMic.SetupGlobalAudio();
+        }
+
+        public void UpdateDisplayLevel()
+        {
+            if (!gMusic.isPlaying) songLevel.text = gMusic.playerData.playerLevel.ToString();
+        }
+
+        public void UpdateDisplaySongResults()
+        {
+            if (!gMusic.isPlaying)
+            {
+                resultObject.SetActive(true);
+                resultScore.text = gMusic.score.ToString();
+                if (gMusic.hasLeveledUp)
+                {
+                    levelUpSprite.SetActive(true);
+                } else
+                {
+                    levelUpSprite.SetActive(false);
+                }
+            } else
+            {
+                resultObject.SetActive(false);
+            }
         }
     }
 }
