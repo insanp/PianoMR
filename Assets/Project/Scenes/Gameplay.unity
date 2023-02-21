@@ -38218,6 +38218,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3257378929780560224, guid: f00c8d8d8cb22d14eb73836631ba50a0,
         type: 3}
+      propertyPath: noiseLevel
+      value: 0.0001
+      objectReference: {fileID: 0}
+    - target: {fileID: 3257378929780560224, guid: f00c8d8d8cb22d14eb73836631ba50a0,
+        type: 3}
       propertyPath: audioSampleRate
       value: 96000
       objectReference: {fileID: 0}
