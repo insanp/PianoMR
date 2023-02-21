@@ -297,21 +297,20 @@ namespace PianoTesisGameplay
 
         private string CreateResultJSON()
         {
-            dynamic result = new ExpandoObject();
-            result.Title = midiFilePlayer.MPTK_MidiName;
-            result.SampleRate = gMic.sampleRate;
-            result.DSPBufferSize = gMic.dspBufferSize;
-            result.FFTSize = gMic.fftSize;
-            result.FFTWindow = gMic.fftWindow.ToString();
-            result.NoiseSize = gMic.noiseLevel;
-            result.MinLatency = (float)GameplayMic.minLatency / (float)gMic.sampleRate;
-            result.MaxLatency = (float)GameplayMic.maxLatency / (float)gMic.sampleRate;
-            result.NumLatencyArtifacts = gMic.numArtifacts;
-            result.NoteSummary = new ExpandoObject();
-            result.NoteSummary.Total = totalNotes;
-            result.NoteSummary.TotalHit = totalHitNotes;
-            result.NoteSummary.TotalMiss = totalMissNotes;
-            result.NoteStats = notePlayStats;
+            SongResult result = new SongResult();
+            result.title = midiFilePlayer.MPTK_MidiName;
+            result.sampleRate = gMic.sampleRate;
+            result.dspBufferSize = gMic.dspBufferSize;
+            result.fftSize = gMic.fftSize;
+            result.fftWindow = gMic.fftWindow.ToString();
+            result.noiseSize = gMic.noiseLevel;
+            result.minLatency = (float)GameplayMic.minLatency / (float)gMic.sampleRate;
+            result.maxLatency = (float)GameplayMic.maxLatency / (float)gMic.sampleRate;
+            result.numLatencyArtifacts = gMic.numArtifacts;
+            result.totalNotes = totalNotes;
+            result.totalHitNotes = totalHitNotes;
+            result.totalMissNotes = totalMissNotes;
+            result.noteStats = notePlayStats;
 
             return JsonConvert.SerializeObject(result);
         }
@@ -444,6 +443,7 @@ namespace PianoTesisGameplay
 
         private bool CheckLevelUp()
         {
+            Debug.Log((float)totalHitNotes / (float)totalNotes * 100);
             score = (float)Math.Round((float)totalHitNotes / (float)totalNotes * 100, 0);
             Debug.Log(score);
             if (score >= thresholdLevelUp) return true;

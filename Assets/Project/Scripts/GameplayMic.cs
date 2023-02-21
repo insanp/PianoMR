@@ -30,7 +30,7 @@ namespace PianoTesisGameplay
 
         public float[] _samples;
         public float[] _freqBand;
-        public float noiseLevel = 0.01f;
+        public float noiseLevel = 0.0001f;
         public int numArtifacts = 0;
         public float time;
 

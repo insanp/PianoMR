@@ -54,10 +54,11 @@ MonoBehaviour:
   sampleRate: 48000
   fftSize: 4096
   pianoFreqSize: 0
-  DSPBufferSize: 512
+  dspBufferSize: 512
+  fftWindow: 5
   _samples: []
   _freqBand: []
-  noiseLevel: 0.01
+  noiseLevel: 0.0001
   numArtifacts: 0
   time: 0
   micValues: []
