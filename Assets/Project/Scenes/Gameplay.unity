@@ -42264,8 +42264,8 @@ MonoBehaviour:
   spatialize: 0
   AudioBufferLenght: 0
   AudioNumBuffers: 0
-  midiNameToPlay: Level 1 - Mary Had a Little Lamb _Melody_
-  midiIndexToPlay: 1
+  midiNameToPlay: Level 1 - Happy Birthday
+  midiIndexToPlay: 0
   MPTK_StartPlayAtFirstNote: 0
   speed: 1
   durationEditorModeOnly: 
@@ -42879,6 +42879,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: GameplayControl
+      objectReference: {fileID: 0}
+    - target: {fileID: 7952826646760602959, guid: 9675f2fcf377b4d45ad58d881d4198ea,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7952826646760602961, guid: 9675f2fcf377b4d45ad58d881d4198ea,
         type: 3}

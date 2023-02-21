@@ -213,6 +213,7 @@ namespace PianoTesisGameplay
         {
             Clear();
             midiFilePlayer.MPTK_Next();
+            if (!CheckSongLevel()) midiFilePlayer.MPTK_Previous();
             PauseSpeed();
         }
 
@@ -220,7 +221,19 @@ namespace PianoTesisGameplay
         {
             Clear();
             midiFilePlayer.MPTK_Previous();
+            if (!CheckSongLevel()) midiFilePlayer.MPTK_Next();
             PauseSpeed();
+        }
+
+        private bool CheckSongLevel()
+        {
+            var splitString = midiFilePlayer.MPTK_MidiName.Split(' ');
+            if (splitString.Length > 0)
+            {
+                int level = Convert.ToInt32(splitString[1]);
+                if (level <= playerData.playerLevel) return true;
+            }
+            return false;
         }
 
         /// <summary>@brief

@@ -11,14 +11,25 @@
   </SoundFonts>
   <IndexSelectedSF>0</IndexSelectedSF>
   <MidiFiles>
-    <string>Animal Crossing - Save Screen</string>
-    <string>Level 1 - Mary Had a Little Lamb _Melody_</string>
-    <string>Level 1 - Ode To Joy _Melody_</string>
+    <string>Level 1 - Happy Birthday</string>
+    <string>Level 1 - Mary Had a Little Lamb</string>
+    <string>Level 1 - Ode To Joy</string>
+    <string>Level 1 - Twinkle Twinkle Little Star</string>
+    <string>Level 2 - Happy Birthday</string>
     <string>Level 2 - Mary Had a Little Lamb</string>
     <string>Level 2 - Ode To Joy</string>
-    <string>Level 3 - All Chromatic</string>
+    <string>Level 2 - Twinkle Twinkle Little Star</string>
     <string>Level 3 - Happy Birthday</string>
+    <string>Level 3 - Mary Had a Little Lamb</string>
+    <string>Level 3 - Ode To Joy</string>
+    <string>Level 3 - Twinkle Twinkle Little Star</string>
+    <string>Level 4 - All Chromatic</string>
+    <string>Level 4 - Claire de Lune</string>
+    <string>Level 4 - Fur Elise</string>
     <string>Level 4 - They Dont Know About Us by One Direction</string>
-    <string>Level 5 - La Campanella by Liszt</string>
+    <string>Level 5 - Claire de Lune</string>
+    <string>Level 5 - Fantaisie Impromptu</string>
+    <string>Level 5 - Fur Elise</string>
+    <string>Level 5 - La Campanella</string>
   </MidiFiles>
 </MidiSet>
