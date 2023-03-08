@@ -76,11 +76,17 @@ MonoBehaviour:
   played: 0
   correctNote: 0
   isSharp: 0
-  canSound: 1
+  canSoundOnHit: 1
+  canAutoSoundOnValidationLine: 0
+  isBeingPaused: 0
+  exceedPauseTime: 0
+  pauseCountdown: 0
   matBlackKey: {fileID: 2100000, guid: 83af10fb360fab14fa4ab464b6a0f20e, type: 2}
   matWhiteKey: {fileID: 2100000, guid: 5d913821ee08ae540bd6da4f692999d8, type: 2}
   matPlayed: {fileID: 2100000, guid: 61d6b36eb6cb5884686960efae97f915, type: 2}
   VFXCorrect: {fileID: 5247034668651291382, guid: ccec1481cf8568f469bf6f289b7e5a37,
+    type: 3}
+  prefabNotePopUpText: {fileID: 5094552752078409257, guid: 358eb3aa4f7751c41981431edac2b51e,
     type: 3}
   targetVector: {x: 0, y: 0, z: 0}
 --- !u!23 &78497568221217960

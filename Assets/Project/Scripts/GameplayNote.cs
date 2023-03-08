@@ -1,6 +1,7 @@
 ﻿using MidiPlayerTK;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 /// <summary>@brief
@@ -28,12 +29,14 @@ namespace PianoTesisGameplay
         public bool exceedPauseTime = false;
         public float pauseCountdown = 0.0f;
         private float maxPauseCountdown = 3.0f;
+        private float timeElapsedSinceLastPrint = 1.0f;
 
         [SerializeField] public Material matBlackKey;
         [SerializeField] public Material matWhiteKey;
         [SerializeField] public Material matPlayed;
 
         [SerializeField] GameObject VFXCorrect;
+        [SerializeField] GameObject prefabNotePopUpText;
 
         public Vector3 targetVector;
 
@@ -81,7 +84,16 @@ namespace PianoTesisGameplay
             if (isBeingPaused)
             {
                 pauseCountdown -= Time.deltaTime;
-                if (pauseCountdown < 0.0f) isBeingPaused = false;
+                timeElapsedSinceLastPrint += Time.deltaTime;
+
+                if (pauseCountdown <= 0.0f) isBeingPaused = false;
+
+                if (timeElapsedSinceLastPrint >= 1.0f && isBeingPaused)
+                {
+                    GameObject obj = Instantiate(prefabNotePopUpText, transform.position, Quaternion.identity) as GameObject;
+                    obj.GetComponentInChildren<TextMeshPro>().text = Mathf.Ceil(pauseCountdown).ToString();
+                    timeElapsedSinceLastPrint = 0.0f;
+                }
             }
         }
         void FixedUpdate()
@@ -108,7 +120,10 @@ namespace PianoTesisGameplay
 
         private void OnDestroy()
         {
-            //Debug.Log("Destroyed at " + timeValidated);
+            if (correctNote) return;
+            GameObject obj = Instantiate(prefabNotePopUpText, transform.position, Quaternion.identity) as GameObject;
+            obj.GetComponentInChildren<TextMeshPro>().text = "Miss";
+            obj.GetComponentInChildren<TextMeshPro>().color = Color.red;
         }
     }
 }

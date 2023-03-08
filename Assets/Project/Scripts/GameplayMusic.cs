@@ -278,13 +278,18 @@ namespace PianoTesisGameplay
         {
             StopSong();
             SaveLog();
-            if (CheckLevelUp())
+            CalculateScore();
+
+            if (mode == GameMode.PLAY)
             {
-                playerData.LevelUp();
-                hasLeveledUp = true;
+                if (CheckLevelUp())
+                {
+                    playerData.LevelUp();
+                    hasLeveledUp = true;
+                }
+                playerData.UpdateHighScore(GetSongLevel(), score);
+                SaveLoadManager.SavePlayerData(playerData);
             }
-            playerData.UpdateHighScore(GetSongLevel(), (int)score);
-            SaveLoadManager.SavePlayerData(playerData);
         }
 
         private void SaveLog()
@@ -368,7 +373,7 @@ namespace PianoTesisGameplay
 
         public void ResumeSpeed()
         {
-            midiFilePlayer.MPTK_Play();
+            midiFilePlayer.MPTK_UnPause();
             Speed = speedMod;
         }
 
@@ -397,7 +402,8 @@ namespace PianoTesisGameplay
             }
             
             ResetNotePlayStats();
-            ResumeSpeed();
+            midiFilePlayer.MPTK_Play();
+            Speed = speedMod;
             isPlaying = true;
             hasLeveledUp = false;
         }
@@ -408,7 +414,6 @@ namespace PianoTesisGameplay
             Clear();
             midiFilePlayer.MPTK_Stop();
             isPlaying = false;
-            ResetNotePlayStats();
             if (mode != GameMode.WATCH) gMic.StopMic();
         }
 
@@ -448,9 +453,13 @@ namespace PianoTesisGameplay
             totalNotes++;
         }
 
-        private bool CheckLevelUp()
+        private void CalculateScore()
         {
             score = (int)Math.Floor((float)totalHitNotes / (float)totalNotes * 100);
+        }
+
+        private bool CheckLevelUp()
+        {
             if (score >= thresholdLevelUp && CompareSongLeveltoUser() == 0) return true;
 
             return false;

@@ -24,13 +24,15 @@ namespace PianoTesisGameplay {
                     case GameplayMusic.GameMode.TRAIN:
                         if (notes.Count > 0 && gMusic.onTrainPause)
                         {
-                            gMusic.PauseSpeed();
                             CheckNoteCountdown();
                         }
                         else
                         {
-                            gMusic.onTrainPause = false;
-                            gMusic.ResumeSpeed();
+                            if (gMusic.midiFilePlayer.MPTK_IsPaused)
+                            {
+                                gMusic.onTrainPause = false;
+                                gMusic.ResumeSpeed();
+                            }
                         }
                         break;
                 }
@@ -57,6 +59,7 @@ namespace PianoTesisGameplay {
                 {
                     note.isBeingPaused = true;
                     gMusic.onTrainPause = true;
+                    gMusic.PauseSpeed();
                 }
             }
         }
