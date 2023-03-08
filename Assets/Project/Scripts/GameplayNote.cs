@@ -23,8 +23,11 @@ namespace PianoTesisGameplay
         public bool canSoundOnHit = true;
         public bool canAutoSoundOnValidationLine = false;
 
-        public bool isBeingValidated = false;
-        public float timeValidated = 0.0f;
+        // for training purpose
+        public bool isBeingPaused = false;
+        public bool exceedPauseTime = false;
+        public float pauseCountdown = 0.0f;
+        private float maxPauseCountdown = 3.0f;
 
         [SerializeField] public Material matBlackKey;
         [SerializeField] public Material matWhiteKey;
@@ -39,7 +42,7 @@ namespace PianoTesisGameplay
             played = false;
             correctNote = false;
             canAutoSoundOnValidationLine = false;
-            timeValidated = 0.0f;
+            pauseCountdown = maxPauseCountdown;
             if (MidiPlayerTK.HelperNoteLabel.IsSharp(note.Value))
             {
                 isSharp = true;
@@ -51,29 +54,20 @@ namespace PianoTesisGameplay
             }
         }
 
-        // 
-        /// <summary>@brief
-        /// Update
-        /// @code
-        /// midiFilePlayer.MPTK_PlayNote(note);
-        /// FirstNotePlayed = true;
-        /// @endcode
-        /// </summary>
         public void Update()
         {
-            //if (isBeingValidated) timeValidated += Time.deltaTime;
-            // The midi event is played with a MidiStreamPlayer when position X < -45 (falling)
-            if (!played && correctNote) //transform.position.y < 10f)
+            if (!played && correctNote)
             {
                 played = true;
 
                 // Now play the note with a MidiStreamPlayer prefab
                 if (canSoundOnHit) midiStreamPlayer.MPTK_PlayEvent(note);
-                //! [Example PlayNote]
+  
                 FirstNotePlayed = true;
 
                 gameObject.GetComponent<Renderer>().material = matPlayed;// .color = Color.red;
             }
+
             if (transform.position.y < -2f || correctNote)
             {
                 if (correctNote)
@@ -83,12 +77,16 @@ namespace PianoTesisGameplay
                 Destroy(this.gameObject);
             }
 
+            // for training purpose
+            if (isBeingPaused)
+            {
+                pauseCountdown -= Time.deltaTime;
+                if (pauseCountdown < 0.0f) isBeingPaused = false;
+            }
         }
         void FixedUpdate()
         {
             // Move the note along all axis up to target line
-            //float translation = Time.fixedDeltaTime * GameplayMusic.Speed;
-            //transform.Translate(0, -translation, 0);
             Vector3 translation = targetVector * Time.fixedDeltaTime * GameplayMusic.Speed;
             transform.Translate(translation);
         }

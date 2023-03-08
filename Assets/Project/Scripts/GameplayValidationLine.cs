@@ -17,17 +17,23 @@ namespace PianoTesisGameplay {
 
         private void Update()
         {
-            switch (gMusic.mode)
+            if (gMusic.isPlaying)
             {
-                case GameplayMusic.GameMode.TRAIN:
-                    if (notes.Count > 0 )
-                    {
-                        gMusic.PauseSpeed();
-                    } else
-                    {
-                        gMusic.ResumeSpeed();
-                    }
-                    break;
+                switch (gMusic.mode)
+                {
+                    case GameplayMusic.GameMode.TRAIN:
+                        if (notes.Count > 0 && gMusic.onTrainPause)
+                        {
+                            gMusic.PauseSpeed();
+                            CheckNoteCountdown();
+                        }
+                        else
+                        {
+                            gMusic.onTrainPause = false;
+                            gMusic.ResumeSpeed();
+                        }
+                        break;
+                }
             }
         }
 
@@ -37,7 +43,7 @@ namespace PianoTesisGameplay {
             {
                 GameplayNote note = collision.GetComponent<GameplayNote>();
                 note.GetComponent<Renderer>().material.color = Color.red;
-                note.isBeingValidated = true;
+                
                 if (gMusic.mode == GameplayMusic.GameMode.WATCH)
                 {
                     note.CorrectNote();
@@ -45,6 +51,12 @@ namespace PianoTesisGameplay {
                 } else
                 {
                     notes.Add(note);
+                }
+
+                if (gMusic.mode == GameplayMusic.GameMode.TRAIN)
+                {
+                    note.isBeingPaused = true;
+                    gMusic.onTrainPause = true;
                 }
             }
         }
@@ -63,6 +75,17 @@ namespace PianoTesisGameplay {
         public void ClearNotes()
         {
             notes.Clear();
+        }
+
+        private void CheckNoteCountdown()
+        {
+            bool check = false;
+            for (var i = 0; i < notes.Count; i++)
+            {
+                check = check || notes[i].isBeingPaused;
+                if (check) return;
+            }
+            gMusic.onTrainPause = false;
         }
     }
 }

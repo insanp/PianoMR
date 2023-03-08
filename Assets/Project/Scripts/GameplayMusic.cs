@@ -56,6 +56,10 @@ namespace PianoTesisGameplay
 
         public GameMode mode;
 
+        public bool onTrainPause = false;
+        public float trainPauseCountDown = 0.0f;
+        private float trainPauseCountDownFrom = 3.0f;
+
         public float minZ, maxZ, minX, maxX;
         public float LastTimeCollider;
         public float DelayCollider = 5;
@@ -120,11 +124,6 @@ namespace PianoTesisGameplay
             Debug.Log(spawnLineDistanceVector);
         }
 
-        /// <summary>@brief
-        /// Call when a group of midi events is ready to plays from the the midi reader.
-        /// Playing the events are delayed until they "fall out"
-        /// </summary>
-        /// <param name="notes"></param>
         public void NotesToPlay(List<MPTKEvent> notes)
         {
             // Count gameobject for each z position in the plan. Useful to stack them.
@@ -247,17 +246,12 @@ namespace PianoTesisGameplay
             return 0;
         }
 
-        /// <summary>@brief
-        /// Remove all gameobject Note on the screen
-        /// </summary>
         public void Clear()
         {
             GameplayNote[] components = GameObject.FindObjectsOfType<GameplayNote>();
             foreach (GameplayNote noteview in components)
             {
-                if (noteview.enabled)
-                    //Debug.Log("destroy " + ut.name);
-                    DestroyImmediate(noteview.gameObject);
+                if (noteview.enabled) DestroyImmediate(noteview.gameObject);
             }
 
             // destroy all notes in validation line
@@ -414,6 +408,7 @@ namespace PianoTesisGameplay
             Clear();
             midiFilePlayer.MPTK_Stop();
             isPlaying = false;
+            ResetNotePlayStats();
             if (mode != GameMode.WATCH) gMic.StopMic();
         }
 

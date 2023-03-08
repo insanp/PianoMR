@@ -25,6 +25,7 @@ namespace PianoTesisGameplay
 
         [SerializeField] public TextMeshPro totalHit;
         [SerializeField] public TextMeshPro totalMiss;
+        [SerializeField] public TextMeshPro pauseCountDown;
 
         [SerializeField] public GameObject resultObject;
         [SerializeField] public TextMeshPro resultScore;
