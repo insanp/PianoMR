@@ -15,6 +15,7 @@ namespace PianoTesisGameplay
     {
         public bool useMic;
         public bool useMRTK;
+        public bool useBestSetup;
         private AudioSource _audioSource;
         public AudioMixerGroup mixerGroupMic, mixerGroupMaster;
         private WindowsMicrophoneStream micStream = null;
@@ -27,6 +28,12 @@ namespace PianoTesisGameplay
         [SerializeField] public int pianoFreqSize;
         [SerializeField] public int dspBufferSize = 512;
         [SerializeField] public FFTWindow fftWindow = FFTWindow.BlackmanHarris; // defaults to BlackmanHarris
+
+        // these values are from testing
+        private int bestSampleRate = 44100;
+        private int bestFftSize = 8192;
+        private int bestDspBufferSize = 512;
+        private FFTWindow bestFftWindow = FFTWindow.BlackmanHarris;
 
         public float[] _samples;
         public float[] _freqBand;
@@ -54,16 +61,22 @@ namespace PianoTesisGameplay
             _audioSource = GetComponent<AudioSource>();
             pianoFreqSize = HelperPianoFreq.keys.Length;
 
+            if (useBestSetup)
+            {
+                SetupBestGlobalAudio();
+            }
+            else
+            {
+                dspBufferSize = PlayerPrefs.GetInt("dspBufferSize", dspBufferSize);
+                sampleRate = PlayerPrefs.GetInt("sampleRate", sampleRate);
+                fftSize = PlayerPrefs.GetInt("fftSize", fftSize);
+                fftWindow = HelperAudioSetting.fftWindows[PlayerPrefs.GetInt("fftWindow", 3)];
+            }
+
             _samples = new float[fftSize];
             _freqBand = new float[pianoFreqSize];
 
             freqStep = sampleRate / _samples.Length;
-
-            dspBufferSize = PlayerPrefs.GetInt("dspBufferSize", dspBufferSize);
-            sampleRate = PlayerPrefs.GetInt("sampleRate", sampleRate);
-            fftSize = PlayerPrefs.GetInt("fftSize", fftSize);
-            fftWindow = HelperAudioSetting.fftWindows[PlayerPrefs.GetInt("fftWindow", 3)];
-
             //SetupGlobalAudio();
         }
         
@@ -453,6 +466,21 @@ namespace PianoTesisGameplay
                 }
 
                 _freqBand[i] = val * 10;
+            }
+        }
+
+        private void SetupBestGlobalAudio()
+        {
+            dspBufferSize = bestDspBufferSize;
+            sampleRate = bestSampleRate;
+            fftSize = bestFftSize;
+            fftWindow = bestFftWindow;
+
+            AudioConfiguration config = AudioSettings.GetConfiguration();
+            if (config.dspBufferSize != dspBufferSize &&
+                config.sampleRate != sampleRate)
+            {
+                SetupGlobalAudio();
             }
         }
 

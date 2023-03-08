@@ -34,6 +34,13 @@ namespace PianoTesisGameplay
         [SerializeField] public GameObject whiteKeys;
         [SerializeField] public GameObject markers;
 
+        // hardcoded to just 5 levels
+        [SerializeField] public TextMeshPro highScoreLv1;
+        [SerializeField] public TextMeshPro highScoreLv2;
+        [SerializeField] public TextMeshPro highScoreLv3;
+        [SerializeField] public TextMeshPro highScoreLv4;
+        [SerializeField] public TextMeshPro highScoreLv5;
+
         private GameplayMusic gMusic;
         private GameplayMic gMic;
 
@@ -47,6 +54,7 @@ namespace PianoTesisGameplay
             UpdateTitleSong();
             UpdateDisplayLevel();
             UpdateDisplaySongResults();
+            UpdateHighScore();
             InitializeSetupAudio();
         }
 
@@ -143,6 +151,36 @@ namespace PianoTesisGameplay
             } else
             {
                 resultObject.SetActive(false);
+            }
+        }
+
+        public void UpdateHighScore()
+        {
+            highScoreLv1.text = highScoreLv2.text = highScoreLv3.text = highScoreLv4.text = highScoreLv5.text = "0";
+
+            if (gMusic.playerData.levelHighScore.Count == 0) return;
+            foreach(KeyValuePair<int, int> highScore in gMusic.playerData.levelHighScore)
+            {
+                switch (highScore.Key)
+                {
+                    case 1:
+                        highScoreLv1.text = highScore.Value.ToString();
+                        break;
+                    case 2:
+                        highScoreLv2.text = highScore.Value.ToString();
+                        break;
+                    case 3:
+                        highScoreLv3.text = highScore.Value.ToString();
+                        break;
+                    case 4:
+                        highScoreLv4.text = highScore.Value.ToString();
+                        break;
+                    case 5:
+                        highScoreLv5.text = highScore.Value.ToString();
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }

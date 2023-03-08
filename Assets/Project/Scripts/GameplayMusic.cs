@@ -7,6 +7,7 @@ using UnityEngine.Events;
 using System.IO;
 using Newtonsoft.Json;
 using System.Dynamic;
+using UnityEngine.SceneManagement;
 
 namespace PianoTesisGameplay
 {
@@ -40,8 +41,8 @@ namespace PianoTesisGameplay
         public int totalNotes;
         public int totalHitNotes;
         public int totalMissNotes;
-        public float score;
-        private float thresholdLevelUp = 80f;
+        public int score;
+        private int thresholdLevelUp = 80;
         public bool isPlaying;
         public bool hasLeveledUp;
         public PlayerData playerData;
@@ -213,7 +214,7 @@ namespace PianoTesisGameplay
         {
             Clear();
             midiFilePlayer.MPTK_Next();
-            if (!CheckSongLevel()) midiFilePlayer.MPTK_Previous();
+            if (CompareSongLeveltoUser() > 0) midiFilePlayer.MPTK_Previous();
             PauseSpeed();
         }
 
@@ -221,19 +222,29 @@ namespace PianoTesisGameplay
         {
             Clear();
             midiFilePlayer.MPTK_Previous();
-            if (!CheckSongLevel()) midiFilePlayer.MPTK_Next();
+            if (CompareSongLeveltoUser() > 0) midiFilePlayer.MPTK_Next();
             PauseSpeed();
         }
 
-        private bool CheckSongLevel()
+        private int CompareSongLeveltoUser()
+        {
+            int level = GetSongLevel();
+            if (level != 0)
+            {
+                if (level == playerData.playerLevel) return 0;
+                if (level > playerData.playerLevel) return 1;
+            }
+            return -1;
+        }
+
+        private int GetSongLevel()
         {
             var splitString = midiFilePlayer.MPTK_MidiName.Split(' ');
             if (splitString.Length > 0)
             {
-                int level = Convert.ToInt32(splitString[1]);
-                if (level <= playerData.playerLevel) return true;
+                return Convert.ToInt32(splitString[1]);
             }
-            return false;
+            return 0;
         }
 
         /// <summary>@brief
@@ -276,9 +287,10 @@ namespace PianoTesisGameplay
             if (CheckLevelUp())
             {
                 playerData.LevelUp();
-                SaveLoadManager.SavePlayerData(playerData);
                 hasLeveledUp = true;
             }
+            playerData.UpdateHighScore(GetSongLevel(), (int)score);
+            SaveLoadManager.SavePlayerData(playerData);
         }
 
         private void SaveLog()
@@ -443,10 +455,8 @@ namespace PianoTesisGameplay
 
         private bool CheckLevelUp()
         {
-            Debug.Log((float)totalHitNotes / (float)totalNotes * 100);
-            score = (float)Math.Round((float)totalHitNotes / (float)totalNotes * 100, 0);
-            Debug.Log(score);
-            if (score >= thresholdLevelUp) return true;
+            score = (int)Math.Floor((float)totalHitNotes / (float)totalNotes * 100);
+            if (score >= thresholdLevelUp && CompareSongLeveltoUser() == 0) return true;
 
             return false;
         }
@@ -465,6 +475,14 @@ namespace PianoTesisGameplay
         {
             playerData.Initialize();
             SaveLoadManager.SavePlayerData(playerData);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
+        public void ResetPlayerHighScore()
+        {
+            playerData.levelHighScore.Clear();
+            SaveLoadManager.SavePlayerData(playerData);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 }
