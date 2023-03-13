@@ -44,7 +44,6 @@ namespace PianoTesisGameplay {
             if (collision.gameObject.tag == "Note")
             {
                 GameplayNote note = collision.GetComponent<GameplayNote>();
-                note.GetComponent<Renderer>().material.color = Color.red;
                 
                 if (gMusic.mode == GameplayMusic.GameMode.WATCH)
                 {

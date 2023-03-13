@@ -30,6 +30,7 @@ namespace PianoTesisGameplay
         [SerializeField] public Transform spawnLine;
         [SerializeField] public GameplayMic gMic;
         [SerializeField] public Transform thePianoParent;
+        [SerializeField] public GameObject vfxLevelUp;
 
         public Vector3 semitoneDistanceVector;
         public Vector3 spawnLineDistanceVector;
@@ -279,13 +280,14 @@ namespace PianoTesisGameplay
             StopSong();
             SaveLog();
             CalculateScore();
-
+            
             if (mode == GameMode.PLAY)
             {
                 if (CheckLevelUp())
                 {
                     playerData.LevelUp();
                     hasLeveledUp = true;
+                    Instantiate(vfxLevelUp, validationLine.transform, false);
                 }
                 playerData.UpdateHighScore(GetSongLevel(), score);
                 SaveLoadManager.SavePlayerData(playerData);

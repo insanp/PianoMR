@@ -29518,6 +29518,11 @@ PrefabInstance:
       propertyPath: m_Center.z
       value: 0.05
       objectReference: {fileID: 0}
+    - target: {fileID: 5426829155451264607, guid: 98ea15acd4af41342a8cb5f6a5b31077,
+        type: 3}
+      propertyPath: stopAction
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6622537270973627778, guid: 98ea15acd4af41342a8cb5f6a5b31077,
         type: 3}
       propertyPath: m_IsActive
@@ -46713,6 +46718,12 @@ PrefabInstance:
       propertyPath: targetLine
       value: 
       objectReference: {fileID: 885018956}
+    - target: {fileID: 5026760824967835379, guid: c73c2f2df2d6c4b49b94e8ca0113aa60,
+        type: 3}
+      propertyPath: vfxLevelUp
+      value: 
+      objectReference: {fileID: 135494574454138356, guid: c09a7df2618317142be7ad7b09743d83,
+        type: 3}
     - target: {fileID: 5026760824967835379, guid: c73c2f2df2d6c4b49b94e8ca0113aa60,
         type: 3}
       propertyPath: NoteDisplay
