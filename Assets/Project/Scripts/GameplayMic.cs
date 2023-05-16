@@ -343,13 +343,14 @@ namespace PianoTesisGameplay
             if (indexMax > 0 && indexMax < fftSize - 1)
             {
                 // interpolate index using neighbours
-                var dL = _samples[indexMax - 1] / _samples[indexMax]; //This line 1
-                var dR = _samples[indexMax + 1] / _samples[indexMax]; //This line 2
-                freqN += 0.5f * (dR * dR - dL * dL); //This line 3
+                var dL = _samples[indexMax - 1] / _samples[indexMax]; // left bin
+                var dR = _samples[indexMax + 1] / _samples[indexMax]; // right bin
+                freqN += 0.5f * (dR * dR - dL * dL); // estimate actual index
             }
-            float pitchValue = freqN * (sampleRate / 2) / fftSize; // convert index to frequency //This line 4
-                                                                   //Debug.Log(indexMax + " = " + pitchValue);
-                                                                   //Debug.Log(HelperPianoFreq.labels[HelperPianoFreq.searchNear(pitchValue)]);
+            float pitchValue = freqN * (sampleRate / 2) / fftSize; // convert index to frequency
+
+            //Debug.Log(indexMax + " = " + pitchValue);
+            //Debug.Log(HelperPianoFreq.labels[HelperPianoFreq.searchNear(pitchValue)]);
             return pitchValue;
         }
 
