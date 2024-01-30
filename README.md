@@ -1,5 +1,5 @@
 # PianoMR
-PianoMR is a mixed reality application with audio processing feature aimed for learning songs using piano. It is developed for HoloLens 2 device.
+PianoMR is a mixed reality application with audio processing feature aimed for learning songs using piano. It is developed for HoloLens 2 device. For the overview research and experiment, please refer to https://ieeexplore.ieee.org/document/10176148/ .
 
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/gQNFvLZTJiI/0.jpg)](http://www.youtube.com/watch?v=gQNFvLZTJiI "Using HoloLens 2 to Practice Piano")
 
